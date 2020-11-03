@@ -17,15 +17,17 @@ W=$3
 mkdir -p $ODIR
 
 
+if [ ! -f $PRE.tbl ]; then
+  bedtools makewindows -g $FASTA.fai -w $W > $PRE.bed
+  bedtools getfasta -fi $FASTA -bed $PRE.bed > $PRE.fasta
 
-bedtools makewindows -g $FASTA.fai -w $W > $PRE.bed
-bedtools getfasta -fi $FASTA -bed $PRE.bed > $PRE.fasta
+  minimap2 -t 80 -f 0.0001 --eqx -ax ava-ont $PRE.fasta $PRE.fasta \
+    | samtools view -b -F 4 - \
+    | samtools sort -@ 6 -m 20G - \
+    > $PRE.bam
 
-minimap2 -t 80 -f 0.0001 --eqx -ax ava-ont $PRE.fasta $PRE.fasta \
-  | samtools view -b -F 4 - \
-  | samtools sort -@ 6 -m 20G - \
-  > $PRE.bam
+  ./samIdentity.py --header $PRE.bam > $PRE.tbl
+fi
 
-./samIdentity.py --header $PRE.bam > $PRE.tbl
 ./refmt.py --window $W --fai $FASTA.fai $PRE.tbl > $PRE.aln.bed
 

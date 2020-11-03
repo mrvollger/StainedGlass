@@ -10,6 +10,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("infile", help="samid table")
     parser.add_argument("--window", help="window size", type=int, required=True)
+    parser.add_argument("--ncolors", help="number of color qauntiles", type=int, default=10)
     parser.add_argument("--fai", help="fai for the genome", required=True)
     parser.add_argument("-d", help="store args.d as true if -d",  action="store_true", default=False)
     args = parser.parse_args()
@@ -48,6 +49,8 @@ if __name__ == "__main__":
 
     out=pd.concat([out, out2]).drop_duplicates().sort_values(by=["query_name", "query_start", 
                                                                  "reference_name", "reference_start"])
-
+    out["qcut"] = pd.qcut(out["perID_by_events"], args.ncolors, duplicates="drop", labels=False)
+   
+    sys.stdout.write("#"+"\t".join(out.columns)+"\n")
     out.to_csv(sys.stdout, index=False, header=False, sep="\t")
 
