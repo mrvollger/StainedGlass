@@ -21,17 +21,17 @@ if __name__ == "__main__":
                        "reference_name",
                        "matches"], inplace=True, ascending=False)
     df.drop_duplicates(subset=["query_name", "reference_name"], inplace=True)
-    q_fix = df.query_name.str.extract(r'(chr\d+):(\d+)-\d+', expand=True)
+    q_fix = df.query_name.str.extract(r'(.+):(\d+)-\d+', expand=True)
     df.query_name = q_fix[0]
     df.query_start =  q_fix[1].astype(int)
     df.query_end = q_fix[1].astype(int) + args.window
 
-    r_fix = df.reference_name.str.extract(r'(chr\d+):(\d+)-\d+', expand=True)
+    r_fix = df.reference_name.str.extract(r'(.+):(\d+)-\d+', expand=True)
     df.reference_name = r_fix[0]
     df.reference_start = r_fix[1].astype(int)
     df.reference_end = r_fix[1].astype(int) + args.window
     
-    #TODO limit the size
+    #limit the size
     fai = pd.read_csv(args.fai, sep="\t",names=["chr", "length", "x","y","z"])[["chr","length"]]
     df = pd.merge(df, fai, left_on="query_name", right_on="chr")
     df = pd.merge(df, fai, left_on="reference_name", right_on="chr")

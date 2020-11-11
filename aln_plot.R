@@ -26,12 +26,12 @@ read_bedpe <- function(f){
   df$second_pos = df$r_st/window
   return(df)
 }
-f="results/chr8.aln.bed"
+f="results/chm13.draft.v1.0.aln.bed"
 df = read_bedpe(f); df
 
 # get the lowest 0.1% of the data so we can not plot it
 bot = quantile(df$perID_by_events, probs=0.001)[[1]]
-p1 = ggplot(df, aes(df$perID_by_events, fill = discrete)) + geom_histogram( bins = 300) + # aes(y=..count../sum(..count..)),
+p1 = ggplot(df, aes(df$perID_by_events, fill = discrete)) + geom_histogram( bins = 300) +
   theme_cowplot() + 
   scale_fill_brewer(palette = "Spectral", direction = -1) + theme(legend.position = "none") + 
   coord_cartesian(xlim = c(bot, 100))
@@ -42,3 +42,7 @@ p2 = ggplot(df) +
 p3 = plot_grid(p1, p2, ncol=1,rel_heights = c(1,4));p3
 
 ggsave("results/chr8.aln.pdf", plot=p3, height = 9, width = 9)
+
+
+display.brewer.pal(10,"Spectral")
+brewer.pal(10,"Spectral")

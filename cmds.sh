@@ -16,6 +16,8 @@ FASTA=$2
 W=$3
 mkdir -p $ODIR
 
+awk '{print $1 "\t" $2 }' $FASTA.fai \
+            > $FASTA.chrom.sizes
 
 if [ ! -f $PRE.tbl ]; then
   bedtools makewindows -g $FASTA.fai -w $W > $PRE.bed
@@ -29,14 +31,17 @@ if [ ! -f $PRE.tbl ]; then
   ./samIdentity.py --header $PRE.bam > $PRE.tbl
 fi
 
-awk '{print $1 "\t" $2 }' $FASTA.fai \
-            > $FASTA.chrom.sizes
-./refmt.py --window $W --fai $FASTA.fai $PRE.tbl > $PRE.aln.bed
+if [ ! -f $PRE.aln.bed ]; then
+  ./refmt.py --window $W --fai $FASTA.fai $PRE.tbl > $PRE.aln.bed
+fi
+
+
 cat $PRE.aln.bed | tail -n +2 |  cooler cload pairs -c1 1 -p1 2 -c2 4 -p2 5 \
             --field count=7:agg=mean,dtype=float \
             --chunksize 50000000000 \
             $FASTA.fai:5000 \
 	        --zero-based \
             - $PRE.cool
+
 cooler zoomify --field count:agg=mean,dtype=float $PRE.cool
 
