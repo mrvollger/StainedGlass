@@ -29,5 +29,14 @@ if [ ! -f $PRE.tbl ]; then
   ./samIdentity.py --header $PRE.bam > $PRE.tbl
 fi
 
+awk '{print $1 "\t" $2 }' $FASTA.fai \
+            > $FASTA.chrom.sizes
 ./refmt.py --window $W --fai $FASTA.fai $PRE.tbl > $PRE.aln.bed
+cat $PRE.aln.bed | tail -n +2 |  cooler cload pairs -c1 1 -p1 2 -c2 4 -p2 5 \
+            --field count=7:agg=mean,dtype=float \
+            --chunksize 50000000000 \
+            $FASTA.fai:5000 \
+	        --zero-based \
+            - $PRE.cool
+cooler zoomify --field count:agg=mean,dtype=float $PRE.cool
 
