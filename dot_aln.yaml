@@ -1,0 +1,5 @@
+sample: chm13.draft_v1.0
+nbatch: 1000
+alnthreads: 24
+fasta: ../assemblies/chm13.draft_v1.0.fasta
+window: 5000

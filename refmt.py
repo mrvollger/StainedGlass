@@ -38,7 +38,7 @@ if __name__ == "__main__":
     df.loc[df.query_end >= df.length_x, "length_x"] = df.loc[df.query_end >= df.length_x, "length_x"] - 1 
     df.loc[df.reference_end >= df.length_y, "length_y"] = df.loc[df.reference_end >= df.length_y, "length_y"] - 1 
    
-    out=df[["query_name","query_start","query_end","reference_name","reference_start","reference_end","perID_by_events"]]
+    out=df[["query_name","query_start","query_end","reference_name","reference_start","reference_end","perID_by_events", "strand"]]
     out2 = out.copy()
     out2.reference_name = out.query_name
     out2.reference_start = out.query_start

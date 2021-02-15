@@ -5,44 +5,149 @@ require(scales)
 library(RColorBrewer)
 library(data.table)
 library(cowplot)
+library(glue)
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 ncolors  = 11 # max value is 11
+TRI=TRUE
+PRE="acro"
+if(TRI){
+  scale=2/3
+}else{
+  scale=1
+}
 
-read_bedpe <- function(f){
-  dfa = fread(f, col.names = c("q", "q_st","q_en","r","r_st","r_en", "perID_by_events") )
-  df = dfa[q == "chr8" & r == "chr8"]
-  # color by quartiles of the data
-  bot = floor(min(df$perID_by_events)); top = 100
-  breaks = unique( c(quantile(df$perID_by_events, probs = seq(0, 1, by = 1/ncolors))) )
+make_scale = function(vals){
+  comma(vals/1e6)
+}
+
+make_k = function(vals){
+  comma(vals/1e3)
+}
+
+
+get_colors = function(sdf){
+  bot = floor(min(sdf$perID_by_events)); top = 100
+  breaks = unique( c(quantile(sdf$perID_by_events, probs = seq(0, 1, by = 1/ncolors))) )
   labels = seq(length(breaks)-1)
-  #print(length(labels))
-  #print(length(breaks))
-  df$discrete <- cut(df$perID_by_events, 
-                     breaks=breaks,
-                     labels = labels,
-                     include.lowest=TRUE)
+  return( cut(sdf$perID_by_events, breaks=breaks, labels = labels, include.lowest=TRUE)  )
+}
+
+read_bedpe <- function(all.files){
+  l <- lapply(all.files, fread, sep="\t")
+  df <- rbindlist( l )
+  
+  df$discrete = get_colors(df)
+  if("#query_name" %in% colnames(df)){
+    df$q = df$`#query_name`
+    df$q_st = df$query_start
+    df$q_en = df$query_end
+    df$r = df$reference_name
+    df$r_st = df$reference_start
+    df$r_en = df$reference_end
+  } 
   window=max(df$q_en-df$q_st)
   df$first_pos = df$q_st/window
   df$second_pos = df$r_st/window
   return(df)
 }
-f="results/chm13.draft.v1.0.aln.bed"
-df = read_bedpe(f); df
 
 # get the lowest 0.1% of the data so we can not plot it
-bot = quantile(df$perID_by_events, probs=0.001)[[1]]
-p1 = ggplot(df, aes(df$perID_by_events, fill = discrete)) + geom_histogram( bins = 300) +
-  theme_cowplot() + 
-  scale_fill_brewer(palette = "Spectral", direction = -1) + theme(legend.position = "none") + 
-  coord_cartesian(xlim = c(bot, 100))
-p2 = ggplot(df) +
-  geom_raster(aes(first_pos,second_pos, fill = discrete)) + 
-  theme_cowplot() + scale_fill_brewer(palette = "Spectral", direction = -1) + theme(legend.position = "none", strip.text.x = element_blank()) + 
-  coord_fixed(ratio = 1)
-p3 = plot_grid(p1, p2, ncol=1,rel_heights = c(1,4));p3
+make_hist = function(sdf){
+  bot = quantile(sdf$perID_by_events, probs=0.001)[[1]]
+  p = ggplot(data=sdf, aes(perID_by_events, fill = discrete)) + geom_histogram( bins = 300) +
+    theme_cowplot() + 
+    scale_fill_brewer(palette = "Spectral", direction = -1) + theme(legend.position = "none") + 
+    scale_y_continuous(labels=make_k) +
+    coord_cartesian(xlim = c(bot, 100))+
+    xlab("% identity")+ylab("# of alignments (thousands)")
+  p
+}
 
-ggsave("results/chr8.aln.pdf", plot=p3, height = 9, width = 9)
+make_tri = function(sdf, rname=""){
+  sdf$w = (sdf$first_pos  + sdf$second_pos) 
+  sdf$z = -sdf$first_pos + sdf$second_pos
+  window = max(sdf$q_en - sdf$q_st)
+  scale =  max(sdf$q_st)/max(sdf$w) 
+  
+  ggplot(sdf) +
+    geom_tile(aes(x = w*scale, y = z*window , fill = discrete)) + 
+    theme_cowplot() + 
+    scale_fill_brewer(palette = "Spectral", direction = -1) + 
+    scale_x_continuous(labels=make_scale) +
+    scale_y_continuous(labels=make_scale, limits = c(0,NA)) +
+    #coord_fixed(ratio = 1) +
+    xlab("genomic position (Mbp)") + ylab("") +
+    theme(legend.position = "none", 
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.line.y = element_blank()) + 
+    ggtitle(rname)
+}
+#t = df[r==df$r[1] & q_en < 1e6 & r_en < 1e6]
+#t = df[r == df$r[1]]
+#make_tri(t, rname="a")
+#make_dot(t, rname="a")
+
+make_dot = function(sdf, rname=""){
+  max = max(sdf$q_en, sdf$r_en)
+  window = max(sdf$query_end - sdf$query_start)
+  ggplot(sdf) +
+    geom_tile(aes(x = q_st, y = r_st, fill = discrete, height=window, width=window)) + 
+    theme_cowplot() + 
+    scale_fill_brewer(palette = "Spectral", direction = -1) + 
+    theme(legend.position = "none") + 
+    scale_x_continuous(labels=make_scale, limits = c(0,max)) +
+    scale_y_continuous(labels=make_scale, limits = c(0,max)) +
+    coord_fixed(ratio = 1) +
+    facet_grid( r ~ q )+
+    xlab("genomic position (Mbp)") + ylab("") +
+    ggtitle(rname)
+}
 
 
-display.brewer.pal(10,"Spectral")
-brewer.pal(10,"Spectral")
+make_plots <- function(r_name) {
+  sdf = copy(df[r == r_name & q == r_name])
+  
+  if(TRI){
+    p_group = make_tri(sdf, rname=r_name)   
+    sdf$discrete = get_colors(sdf)
+    p_lone = make_tri(sdf, rname=r_name)
+  }else{
+    p_group = make_dot(sdf, rname=r_name)   
+    sdf$discrete = get_colors(sdf)
+    p_lone = make_dot(sdf, rname=r_name)
+  }
+  p_hist = make_hist(sdf)
+  
+  ggsave(plot = plot_grid(p_lone, p_hist,
+                          ncol=1, rel_heights = c(3*scale,1)
+                          ),
+         file=glue("results/{PRE}.tri.{TRI}_{r_name}.pdf"), height = 12*scale, width = 9)
+  ggsave(glue("results/{PRE}.tri.{TRI}_{r_name}.png"), plot=p_lone+theme_nothing(), height = 4, width = 10, dpi = 300)
+  ggsave(glue("results/{PRE}.tri.{TRI}_{r_name}_hist.png"), plot=p_hist, height = 4, width = 4, dpi = 300)
+  
+  p_group
+}
+
+#p="results/acrocenRegion_chr*.0.00001.aln.bed"
+p=glue('results/{PRE}.5000.10000.bed')
+all.files = Sys.glob(p)
+df = read_bedpe(all.files)
+Qs = unique(df$q)
+N=length(Qs)
+columns = ceiling(sqrt(N+1))
+rows = ceiling( (N+1) / columns)
+
+#df_s = df[ df$r <= df$q  & df$query_end < 6e6 & df$reference_end < 6e6] 
+facet_fig = cowplot::plot_grid(make_hist(df), make_dot(df), rel_heights = c(1,4), ncol=1)
+ggsave(plot=facet_fig, file=glue("results/{PRE}.facet.all.6mb.pdf"), height = 20, width = 16)
+ggsave(plot=facet_fig, file=glue("results/{PRE}.facet.all.6mb.png"), height = 20, width = 16, dpi=1600)
+
+
+plots = lapply(Qs, make_plots)
+plots[[N+1]] = make_hist(df) 
+
+p = plot_grid(plotlist = plots, nrow=rows, ncol=columns, labels = "auto");
+
+ggsave(glue("results/{PRE}.tri.{TRI}_all.pdf"), plot=p, height = 6*rows*scale, width = 6*columns)
+

@@ -1,0 +1,7 @@
+name: cooler
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - cooler
