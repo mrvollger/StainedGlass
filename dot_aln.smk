@@ -47,9 +47,12 @@ wildcard_constraints:
 rule all:
   input:
     alns = expand("results/{SM}.{W}.{F}.bam", SM=SM, W=W, F=F),
+    sort = expand("results/{SM}.{W}.{F}.sorted.bam", SM=SM, W=W, F=F),
     beds = expand("results/{SM}.{W}.{F}.bed", SM=SM, W=W, F=F),
     cool_s = expand("results/{SM}.{W}.{F}.strand.cool", SM=SM, W=W, F=F),
     cool_i = expand("results/{SM}.{W}.{F}.identity.cool", SM=SM, W=W, F=F),
+    cool_sm = expand("results/{SM}.{W}.{F}.strand.mcool", SM=SM, W=W, F=F),
+    cool_im = expand("results/{SM}.{W}.{F}.identity.mcool", SM=SM, W=W, F=F),
 
 
 rule make_windows:
@@ -134,17 +137,28 @@ rule merge_aln:
     split_ref = rules.window_fa.output.fasta,
   output:
     aln = "results/{SM}.{W}.{F}.bam",
-#idx = "results/{SM}.{W}.{F}.bam.bai",
-  threads: 1
+  threads: 4
   resources:
-    mem = 1
+    mem = 4
   shell:"""
-samtools merge \
-      --reference {input.split_ref} \
+samtools cat \
       -b {input.alns} \
-      --write-index \
-      {output.aln} 
+      -o {output.aln} 
 """
+
+rule sort_aln:
+  input:
+    aln = rules.merge_aln.output.aln,
+  output:
+    aln = "results/{SM}.{W}.{F}.sorted.bam",
+  threads: 8
+  resources:
+    mem = 8
+  shell:"""
+samtools sort -m 4G -@ {threads} \
+	-o {output.aln} {input.aln}
+"""
+
 
 rule identity:
   input:
@@ -188,7 +202,7 @@ rule cooler_strand:
     mem = 64
   shell:"""
 cat {input.bed} | tail -n +2 \
-	| sed 's/\t+\t/\t1\t/g' | sed 's/\t-\t/\t0\t/g' \
+	| sed 's/\t+\t/\t100\t/g' | sed 's/\t-\t/\t50\t/g' \
       | cooler cload pairs \
         -c1 1 -p1 2 -c2 4 -p2 5 \
 				--field count=8:agg=mean,dtype=float \
@@ -196,9 +210,9 @@ cat {input.bed} | tail -n +2 \
         {input.fai}:{wildcards.W} \
         --zero-based \
         - {output.cool}
-
 """
- 
+#| cut -f 8 | head  -n 1000000 | sort | uniq -c 
+
 rule cooler_identity:
   input:
     bed = rules.pair_end_bed.output.bed,
@@ -219,6 +233,36 @@ cat {input.bed} | tail -n +2 \
         --zero-based \
         - {output.cool}
 
+"""
+ 
+rule cooler_zoomify_i:
+  input:
+    i = rules.cooler_identity.output.cool,
+  output:
+    i = "results/{SM}.{W}.{F}.identity.mcool"
+  conda: "envs/cooler.yaml"
+  threads: 8
+  resources:
+    mem = 8
+  shell:"""
+cooler zoomify --field count:agg=mean,dtype=float {input.i} \
+		-n {threads} \
+	 -o {output.i}
+"""
+  
+rule cooler_zoomify_s:
+  input:
+    s = rules.cooler_strand.output.cool,
+  output:
+    s = "results/{SM}.{W}.{F}.strand.mcool"
+  conda: "envs/cooler.yaml"
+  threads: 8
+  resources:
+    mem = 8
+  shell:"""
+cooler zoomify --field count:agg=mean,dtype=float {input.s} \
+		-n {threads} \
+	 -o {output.s}
 """
  
 

@@ -47,8 +47,20 @@ if __name__ == "__main__":
     out2.query_start = out.reference_start
     out2.query_end = out.reference_end
 
-    out=pd.concat([out, out2]).drop_duplicates().sort_values(by=["query_name", "query_start", 
-                                                                 "reference_name", "reference_start"])
+    out=pd.concat([out, 
+                   out2]
+                  ).sort_values(by=["query_name",
+                                    "query_start",
+                                    "reference_name",
+                                    "reference_start", 
+                                    'perID_by_events'], ascending = False
+                                ).drop_duplicates(
+                                    subset=["query_name", 
+                                            'query_start',
+                                            "reference_name",
+                                            'reference_start']
+                                ) 
+
     out["qcut"] = pd.qcut(out["perID_by_events"], args.ncolors, duplicates="drop", labels=False)
    
     sys.stdout.write("#"+"\t".join(out.columns)+"\n")
