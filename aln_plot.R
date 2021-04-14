@@ -9,7 +9,6 @@ library(glue)
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 ncolors  = 11 # max value is 11
 TRI=TRUE
-PRE="acro"
 if(TRI){
   scale=2/3
 }else{
@@ -119,9 +118,11 @@ make_plots <- function(r_name) {
   }
   p_hist = make_hist(sdf)
   
-  ggsave(plot = plot_grid(p_lone, p_hist,
-                          ncol=1, rel_heights = c(3*scale,1)
-                          ),
+  ggsave(plot = cowplot::plot_grid(
+                                    plotlist=c(p_lone, p_hist),
+                                    ncol=1, 
+                                    rel_heights = c(3*scale,1)
+                                  ),
          file=glue("results/{PRE}.tri.{TRI}_{r_name}.pdf"), height = 12*scale, width = 9)
   ggsave(glue("results/{PRE}.tri.{TRI}_{r_name}.png"), plot=p_lone+theme_nothing(), height = 4, width = 10, dpi = 300)
   ggsave(glue("results/{PRE}.tri.{TRI}_{r_name}_hist.png"), plot=p_hist, height = 4, width = 4, dpi = 300)
@@ -129,9 +130,18 @@ make_plots <- function(r_name) {
   p_group
 }
 
-#p="results/acrocenRegion_chr*.0.00001.aln.bed"
-p=glue('results/{PRE}.5000.10000.bed')
-all.files = Sys.glob(p)
+
+#
+# EDIT THIS SECION FOR YOUR INPUTS
+#
+PRE="chr8" # a prefix for your outputs
+GLOB="results/chr8.10000.aln.bed" # the file made by ./refmt.py
+#
+# STOP EDITING
+#
+
+dir.create("results")
+all.files = Sys.glob(GLOB)
 df = read_bedpe(all.files)
 Qs = unique(df$q)
 N=length(Qs)
@@ -140,14 +150,14 @@ rows = ceiling( (N+1) / columns)
 
 #df_s = df[ df$r <= df$q  & df$query_end < 6e6 & df$reference_end < 6e6] 
 facet_fig = cowplot::plot_grid(make_hist(df), make_dot(df), rel_heights = c(1,4), ncol=1)
-ggsave(plot=facet_fig, file=glue("results/{PRE}.facet.all.6mb.pdf"), height = 20, width = 16)
-ggsave(plot=facet_fig, file=glue("results/{PRE}.facet.all.6mb.png"), height = 20, width = 16, dpi=1600)
+ggsave(plot=facet_fig, file=glue("results/{PRE}.facet.all.pdf"), height = 20, width = 16)
+ggsave(plot=facet_fig, file=glue("results/{PRE}.facet.all.png"), height = 20, width = 16, dpi=1600)
 
 
 plots = lapply(Qs, make_plots)
 plots[[N+1]] = make_hist(df) 
 
-p = plot_grid(plotlist = plots, nrow=rows, ncol=columns, labels = "auto");
+p = cowplot::plot_grid(plotlist = plots, nrow=rows, ncol=columns, labels = "auto");
 
 ggsave(glue("results/{PRE}.tri.{TRI}_all.pdf"), plot=p, height = 6*rows*scale, width = 6*columns)
 

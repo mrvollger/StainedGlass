@@ -23,7 +23,7 @@ samtools faidx $FASTA
 awk '{print $1 "\t" $2 }' $FASTA.fai \
             > $FASTA.chrom.sizes
 
-alntype="cram"
+alntype="bam"
 
 if [ ! -f $PRE.$F.$alntype ]; then
   bedtools makewindows -g $FASTA.fai -w $W > $PRE.bed
@@ -32,7 +32,7 @@ if [ ! -f $PRE.$F.$alntype ]; then
   minimap2 -t 80 -f $F --eqx -ax ava-ont $PRE.fasta $PRE.fasta \
     | samtools view -u -F 4 - \
     | samtools sort -m 100G --write-index \
-    -O CRAM -T $FASTA \
+    -T $FASTA \
     -o $PRE.$F.$alntype
 fi
 
