@@ -49,6 +49,7 @@ rule all:
     alns = expand("results/{SM}.{W}.{F}.bam", SM=SM, W=W, F=F),
     sort = expand("results/{SM}.{W}.{F}.sorted.bam", SM=SM, W=W, F=F),
     beds = expand("results/{SM}.{W}.{F}.bed", SM=SM, W=W, F=F),
+    fulls = expand("results/{SM}.{W}.{F}.full.tbl", SM=SM, W=W, F=F),
     cool_s = expand("results/{SM}.{W}.{F}.strand.cool", SM=SM, W=W, F=F),
     cool_i = expand("results/{SM}.{W}.{F}.identity.cool", SM=SM, W=W, F=F),
     cool_sm = expand("results/{SM}.{W}.{F}.strand.mcool", SM=SM, W=W, F=F),
@@ -179,13 +180,15 @@ rule pair_end_bed:
     tbl = rules.identity.output.tbl,
     fai = FAI,
   output:
-    bed = "results/{SM}.{W}.{F}.bed"
+    bed = "results/{SM}.{W}.{F}.bed",
+    full = "results/{SM}.{W}.{F}.full.tbl"
   threads: 1
   resources:
     mem = 64
   shell:"""
 {SDIR}/refmt.py \
     --window {wildcards.W} --fai {input.fai} \
+    --full {output.full} \
     {input.tbl} > {output.bed}
 """
  
