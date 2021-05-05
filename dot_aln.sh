@@ -4,7 +4,8 @@ smk=/net/eichler/vol26/projects/sda_assemblies/nobackups/software/miniconda3/env
 which snakemake 
 which $smk
 
-if [ $1 == "local" ]; then
+if [ $1 != "cluster" ]; then
+  echo "running locally"
   $smk -s ./dot_aln.smk \
     -p -j 250 -k \
     "${@:2}"

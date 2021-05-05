@@ -9,6 +9,7 @@ import pandas as pd
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("infile", help="samid table")
+    parser.add_argument("outfile", help="output bed file")
     parser.add_argument("--window", help="window size", type=int, required=True)
     parser.add_argument("--full",
                         help="place to drop the full bed file with the extra columns",
@@ -81,8 +82,11 @@ if __name__ == "__main__":
                           duplicates="drop",
                           labels=False)
    
-    sys.stdout.write("#"+"\t".join(keep_cols)+"\n")
-    out[keep_cols].to_csv(sys.stdout, index=False, header=False, sep="\t")
+    #sys.stdout.write("#"+"\t".join(keep_cols)+"\n")
+    to_out = out[keep_cols]
+    out_header = keep_cols
+    out_header[0] = "#" + out_header[0]
+    to_out.to_csv(args.outfile, index=False, header=out_header, sep="\t")
     
     if args.full is not None:
         out.to_csv(args.full, index=False, sep="\t")

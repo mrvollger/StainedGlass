@@ -8,13 +8,7 @@ library(cowplot)
 library(glue)
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 ncolors  = 11 # max value is 11
-TRI=TRUE
-if(TRI){
-  scale=2/3
-}else{
-  scale=1
-}
-
+########################################################################################################
 make_scale = function(vals){
   comma(vals/1e6)
 }
@@ -22,7 +16,6 @@ make_scale = function(vals){
 make_k = function(vals){
   comma(vals/1e3)
 }
-
 
 get_colors = function(sdf){
   bot = floor(min(sdf$perID_by_events)); top = 100
@@ -75,7 +68,7 @@ make_tri = function(sdf, rname=""){
     scale_x_continuous(labels=make_scale) +
     scale_y_continuous(labels=make_scale, limits = c(0,NA)) +
     #coord_fixed(ratio = 1) +
-    xlab("genomic position (Mbp)") + ylab("") +
+    xlab("Genomic position (Mbp)") + ylab("") +
     theme(legend.position = "none", 
           axis.text.y = element_blank(),
           axis.ticks.y = element_blank(),
@@ -99,65 +92,106 @@ make_dot = function(sdf, rname=""){
     scale_y_continuous(labels=make_scale, limits = c(0,max)) +
     coord_fixed(ratio = 1) +
     facet_grid( r ~ q )+
-    xlab("genomic position (Mbp)") + ylab("") +
+    xlab("Genomic position (Mbp)") + ylab("") +
     ggtitle(rname)
 }
 
 
 make_plots <- function(r_name) {
   sdf = copy(df[r == r_name & q == r_name])
+  # set the colors
+  if(!ONECOLORSCALE){
+    sdf$discrete = get_colors(sdf)
+  }
   
+  # make the plots
   if(TRI){
-    p_group = make_tri(sdf, rname=r_name)   
-    sdf$discrete = get_colors(sdf)
     p_lone = make_tri(sdf, rname=r_name)
+    scale = 2/3
   }else{
-    p_group = make_dot(sdf, rname=r_name)   
-    sdf$discrete = get_colors(sdf)
+    scale = 1
     p_lone = make_dot(sdf, rname=r_name)
   }
   p_hist = make_hist(sdf)
   
-  ggsave(plot = cowplot::plot_grid(
-                                    plotlist=c(p_lone, p_hist),
-                                    ncol=1, 
-                                    rel_heights = c(3*scale,1)
-                                  ),
-         file=glue("results/{PRE}.tri.{TRI}_{r_name}.pdf"), height = 12*scale, width = 9)
-  ggsave(glue("results/{PRE}.tri.{TRI}_{r_name}.png"), plot=p_lone+theme_nothing(), height = 4, width = 10, dpi = 300)
-  ggsave(glue("results/{PRE}.tri.{TRI}_{r_name}_hist.png"), plot=p_hist, height = 4, width = 4, dpi = 300)
   
-  p_group
+  # setup the space
+  dir.create(glue("{OUT}/pdfs/{r_name}/"))
+  dir.create(glue("{OUT}/pngs/{r_name}/"))
+  
+  # save the plots
+  plot = cowplot::plot_grid(
+    p_lone, p_hist,
+    ncol=1, 
+    rel_heights = c(3*scale,1)
+  )
+  ggsave(plot=plot,
+         file=glue("{OUT}/pdfs/{r_name}/{PRE}__{r_name}__tri.{TRI}__onecolorscale.{ONECOLORSCALE}.pdf"),
+         height = 12*scale, width = 9)
+  
+  ggsave(plot=plot,
+         file = glue("{OUT}/pngs/{r_name}/{PRE}__{r_name}__tri.{TRI}__onecolorscale.{ONECOLORSCALE}.png"), 
+         height = 12*scale, width = 10, dpi = DPI)
+  
+  p_lone
 }
-
-
+########################################################################################################
 #
 # EDIT THIS SECION FOR YOUR INPUTS
 #
-PRE="chr8" # a prefix for your outputs
-GLOB="results/chr8.10000.aln.bed" # the file made by ./refmt.py
+PRE="acrop-20210423" # a prefix for your outputs
+GLOB="./acrop-20210423-dot-aln-results/acrop-20210423.5000.10000.bed" # the file made by ./refmt.py
+OUT="acrop-20210423-dot-aln-results/figures" # output dir
+
+PRE="Acro_v1.1_20210428" # a prefix for your outputs
+GLOB="results/Acro_v1.1_20210428.10000.10000.bed" # the file made by ./refmt.py
+OUT="acrop-20210423-dot-aln-results/figures_2021_04_28b"
+
+DPI=600
 #
 # STOP EDITING
 #
+########################################################################################################
 
-dir.create("results")
+dir.create(OUT)
+dir.create(glue("{OUT}/pdfs"))
+dir.create(glue("{OUT}/pngs"))
 all.files = Sys.glob(GLOB)
 df = read_bedpe(all.files)
+#df=fread(GLOB)
 Qs = unique(df$q)
 N=length(Qs)
 columns = ceiling(sqrt(N+1))
 rows = ceiling( (N+1) / columns)
 
-#df_s = df[ df$r <= df$q  & df$query_end < 6e6 & df$reference_end < 6e6] 
-facet_fig = cowplot::plot_grid(make_hist(df), make_dot(df), rel_heights = c(1,4), ncol=1)
-ggsave(plot=facet_fig, file=glue("results/{PRE}.facet.all.pdf"), height = 20, width = 16)
-ggsave(plot=facet_fig, file=glue("results/{PRE}.facet.all.png"), height = 20, width = 16, dpi=1600)
+#
+# big plot
+#
+if(T){
+  facet_fig = cowplot::plot_grid(make_hist(df), make_dot(df), rel_heights = c(1,4), ncol=1)
+  ggsave(plot=facet_fig, file=glue("{OUT}/pdfs/{PRE}.facet.all.pdf"), height = 20, width = 16)
+  ggsave(plot=facet_fig, file=glue("{OUT}/pngs/{PRE}.facet.all.png"), height = 20, width = 16, dpi=DPI)
+}
+vals = c(TRUE, FALSE)
+for(TRI in vals){
+  if(TRI){
+    scale = 2/3
+  }else{
+    scale = 1
+  }
+  for(ONECOLORSCALE in vals){
+      plots = lapply(Qs, make_plots)
+      plots[[N+1]] = make_hist(df) 
+      p = cowplot::plot_grid(plotlist = plots, nrow=rows, ncol=columns, labels = "auto");
+      ggsave(glue("{OUT}/pdfs/{PRE}.tri.{TRI}__onecolorscale.{ONECOLORSCALE}__all.pdf"), plot=p, height = 6*rows*scale, width = 6*columns)
+      ggsave(glue("{OUT}/pngs/{PRE}.tri.{TRI}__onecolorscale.{ONECOLORSCALE}__all.png"), plot=p, height = 6*rows*scale, width = 6*columns, dpi=DPI)
+  }
+}
 
-
-plots = lapply(Qs, make_plots)
-plots[[N+1]] = make_hist(df) 
-
-p = cowplot::plot_grid(plotlist = plots, nrow=rows, ncol=columns, labels = "auto");
-
-ggsave(glue("results/{PRE}.tri.{TRI}_all.pdf"), plot=p, height = 6*rows*scale, width = 6*columns)
+if(F){
+  ONECOLORSCALE=FALSE
+  TRI=TRUE
+  z = make_plots(Qs[1])
+  z
+}
 

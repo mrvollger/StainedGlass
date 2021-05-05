@@ -189,7 +189,7 @@ rule pair_end_bed:
 {SDIR}/refmt.py \
     --window {wildcards.W} --fai {input.fai} \
     --full {output.full} \
-    {input.tbl} > {output.bed}
+    {input.tbl} {output.bed}
 """
  
 
