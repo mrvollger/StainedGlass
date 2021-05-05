@@ -8,8 +8,8 @@
 Make `./dot_aln.yaml` with the following feilds:
 ```
 sample: chm13.draft_v1.0  # a prefix for your output
-nbatch: 1000              # number of batches to split your input alignments across
-alnthreads: 24            # alignment threads per batch
+nbatch: 40                # number of batches to split your input alignments across
+alnthreads: 4             # alignment threads per batch
 window: 5000              # window size for alignments 
 fasta: ../assemblies/chm13.draft_v1.0.fasta
 ```
