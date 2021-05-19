@@ -1,7 +1,7 @@
 # Commands that replicate Logsdon 2021 cen 8 dotplot figure
 ```
 ./cmds.sh chr8 ./test/chr8_cen.fasta 5000
-# change the inputs in aln.R and then run
+# change the inputs in `previous_versions/aln_plot.R` and then run
 ```
 
 # Running on the full T2T CHM13 V1.0 assembly
