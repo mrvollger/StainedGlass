@@ -1,7 +1,7 @@
 # StainedGlass
 
 This is repository that makes colorful dot alignment plots.
-![](test/chr13.png "chr13 P arm")
+![](test/chr13_p_arm.png "chr13 P arm")
 
 
 ## Installation 
