@@ -1,6 +1,8 @@
 # StainedGlass
 
 This is repository that makes colorful dot alignment plots.
+![](test/chr13.png "chr13 P arm")
+
 
 ## Installation 
 
@@ -27,6 +29,7 @@ Or do a dry run of the pipeline
 ```
 ./StainedGlass.sh --cores 24 -n
 ```
+Please try the test case with the default configuration file before submitting issues.
 
 ### Making figures for a small number of regions
 To make pdfs and pngs for a particular set of regions just add `make_figures` to your command.
