@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-import pysam
 import numpy as np
 
 SDIR = os.path.realpath(os.path.dirname(srcdir("env.cfg")))
