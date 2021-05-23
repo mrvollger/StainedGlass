@@ -1,26 +1,42 @@
-# Commands that replicate Logsdon 2021 cen 8 dotplot figure
+# StainedGlass
+
+This is repository that makes colorful dot alignment plots.
+
+## Installation 
+
+You will need a current version of `snakemake` to run the code. Please follow the install [instructions](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html).
+
+Afterwards you can download the repository and additional installs will be handled by `snakemake`.
 ```
-./cmds.sh chr8 ./test/chr8_cen.fasta 5000
-# change the inputs in `previous_versions/aln_plot.R` and then run
+git clone https://github.com/mrvollger/StainedGlass.git
 ```
 
-# Running on the full T2T CHM13 V1.0 assembly
-Make `./dot_aln.yaml` with the following feilds:
+## Running
+
+Choose a sample identifier for your run e.g. `chr8` and a fasta file on which you want to show the colorful alignments and the modify the config file `StainedGlass.yaml` accordingly.
 ```
-sample: chm13.draft_v1.0  # a prefix for your output
-nbatch: 40                # number of batches to split your input alignments across
-alnthreads: 4             # alignment threads per batch
-window: 5000              # window size for alignments 
-fasta: ../assemblies/chm13.draft_v1.0.fasta
+sample: small
+fasta: test/small.fasta
 ```
 
-Run the snakemake pipeline with:
+Once this is done you can run the pipeline like so:
 ```
-./dot_aln.sh
+./StainedGlass.sh --cores 24 
+```
+Or do a dry run of the pipeline
+```
+./StainedGlass.sh --cores 24 -n
 ```
 
-Unless you need to use resgen.io ignore the `cooler` rules that fail.
+### Making figures for a small number of regions
+To make pdfs and pngs for a particular set of regions just add `make_figures` to your command.
+```
+./StainedGlass.sh --cores 24 make_figures
+```
 
-Once the pipeline is done open `./aln_plot.R` and look for the section 
-where it tells you to edit the inputs. Then run the script in Rstudio.
 
+### Making a visualization for the whole genome
+This requires the use of the program [HiGlass](https://higlass.io/) and a web browser. But to make the necessary input files for that you can run:
+```
+./StainedGlass.sh --cores 24 cooler
+```
