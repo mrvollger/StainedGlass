@@ -25,6 +25,6 @@ jobs:
       - name: snakemake
         uses: snakemake/snakemake-github-action@v1.18.0
         with:
-          directory: '.test'
+          directory: '.'
           snakefile: 'workflow/Snakefile'
           args: '--cores 1 --use-conda --conda-cleanup-pkgs cache -p make_figures'
