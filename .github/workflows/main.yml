@@ -15,16 +15,12 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  Testing:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: snakemake
-        uses: snakemake/snakemake-github-action@v1.18.0
-        with:
-          directory: '.'
-          snakefile: 'workflow/Snakefile'
-          args: '--cores 1 --use-conda --conda-cleanup-pkgs cache -p make_figures'
+    - name: Test workflow
+      uses: snakemake/snakemake-github-action@v1.18.0
+      with:
+        directory: .test
+        snakefile: workflow/Snakefile
+        args: "--use-conda -j 3 --conda-cleanup-pkgs cache --conda-frontend mamba -p make_figures"
