@@ -5,3 +5,9 @@ channels:
   - defaults
 dependencies:
   - cooler
+  - minimap2
+  - bedtools
+  - samtools
+  - pysam
+  - snakemake
+  - snakefmt

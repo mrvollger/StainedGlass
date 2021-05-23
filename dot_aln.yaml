@@ -1,5 +1,0 @@
-sample: Acro_v1.1_20210428
-nbatch: 500
-alnthreads: 4
-fasta: Acro_v1.1.fasta
-window: 10000
