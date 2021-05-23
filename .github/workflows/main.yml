@@ -22,7 +22,7 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Testing
+      - name: snakemake
         uses: snakemake/snakemake-github-action@v1.18.0
         with:
           directory: '.test'

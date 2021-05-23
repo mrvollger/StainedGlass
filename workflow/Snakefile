@@ -24,7 +24,7 @@ S = config.pop("mm_s", 1000)
 #
 # required options
 #
-FASTA = config["fasta"]
+FASTA = os.path.abspath(config["fasta"])
 FAI = FASTA + ".fai"
 if not os.path.exists(FAI):
     shell(f"samtools faidx {FASTA}")
