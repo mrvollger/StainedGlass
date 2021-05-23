@@ -6,7 +6,9 @@ library(RColorBrewer)
 library(data.table)
 library(cowplot)
 library(glue)
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+require("argparse")
+#setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
 ncolors  = 11 # max value is 11
 ########################################################################################################
 make_scale = function(vals){
@@ -139,13 +141,16 @@ make_plots <- function(r_name) {
 #
 # EDIT THIS SECION FOR YOUR INPUTS
 #
-PRE="acrop-20210423" # a prefix for your outputs
-GLOB="./acrop-20210423-dot-aln-results/acrop-20210423.5000.10000.bed" # the file made by ./refmt.py
-OUT="acrop-20210423-dot-aln-results/figures" # output dir
+parser <- ArgumentParser()
+parser$add_argument("-b", "--bed",  help="bedfile with alignment information")
+parser$add_argument("-p", "--prefix",  help="Prefix for the outputs")
+args <- parser$parse_args()
 
-PRE="Acro_v1.1_20210428" # a prefix for your outputs
-GLOB="results/Acro_v1.1_20210428.10000.10000.bed" # the file made by ./refmt.py
-OUT="acrop-20210423-dot-aln-results/figures_2021_04_28b"
+PRE = args$prefix
+GLOB = args$bed
+OUT=glue("results/{PRE}_figures")
+print(PRE) 
+print(GLOB)
 
 DPI=600
 #

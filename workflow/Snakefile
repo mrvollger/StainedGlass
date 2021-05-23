@@ -4,7 +4,8 @@ import pysam
 import numpy as np
 
 SDIR = os.path.realpath(os.path.dirname(srcdir("env.cfg")))
-shell.prefix(f"source {SDIR}/envs/env.cfg ; set -eo pipefail; ")
+# shell.prefix(f"source {SDIR}/envs/env.cfg ; set -eo pipefail; ")
+shell.prefix(f"set -eo pipefail; ")
 
 
 configfile: "StainedGlass.yaml"
@@ -35,7 +36,6 @@ N = min(N, N_WINDOWS)
 IDS = list(range(N))
 
 sys.stderr.write("N batches {} \n".format(N))
-
 
 localrules:
     merge_aln,
@@ -230,6 +230,36 @@ rule pair_end_bed:
         """
 
 
+#
+# for figures ~ 3Mbp or less
+#
+rule make_R_figures:
+    input:
+        bed=rules.pair_end_bed.output.bed,
+    output:
+        pdf="results/{SM}.{W}.{F}_figures/pdfs/{SM}.{W}.{F}.facet.all.pdf",
+        png="results/{SM}.{W}.{F}_figures/pngs/{SM}.{W}.{F}.facet.all.png",
+    conda:
+        "envs/cooler.yaml"
+    threads: 1
+    resources:
+        mem=64,
+    shell:
+        """
+        Rscript {SDIR}/scripts/aln_plot.R \
+            --bed {input.bed} \
+            --prefix {wildcards.SM}.{wildcards.W}.{wildcards.F}
+        """
+
+
+rule make_figures:
+    input:
+        expand(rules.make_R_figures.output, SM=SM, W=W, F=F),
+
+
+#
+# for large scale vizualization
+#
 rule cooler_strand:
     input:
         bed=rules.pair_end_bed.output.bed,

@@ -11,3 +11,11 @@ dependencies:
   - pysam
   - snakemake
   - snakefmt
+  - r::r-tidyverse
+  - r-data.table
+  - r-cowplot
+  - r-argparse
+  - r-glue
+  - r::r-rcolorbrewer
+  - r::r-scales 
+  

@@ -1,2 +1,2 @@
-sample: chr8
-fasta: test/chr8_cen.fasta
+sample: small
+fasta: test/small.fasta
