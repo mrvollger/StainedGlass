@@ -7,9 +7,6 @@ SDIR = os.path.realpath(os.path.dirname(srcdir("env.cfg")))
 shell.prefix(f"set -eo pipefail; ")
 
 
-configfile: "StainedGlass.yaml"
-
-
 #
 # global options
 #
