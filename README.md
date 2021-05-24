@@ -49,7 +49,8 @@ If you see `tri.TRUE` in the output pdf/png it means that the dot plot is rotate
 
 
 ### Making a visualization for the whole genome
-This requires the use of the program [HiGlass](https://higlass.io/) and a web browser. But to make the necessary input files for that you can run:
+Making an interactive whole genome visualization requires the use of the program [HiGlass](https://higlass.io/) and a web browser. However, this pipeline will make the necessary input files with the following command:
 ```
 ./StainedGlass.sh --cores 24 cooler
 ```
+See the [T2T CHM13 v1.0 StainedGlass](https://resgen.io/paper-data/T2T/views/MtjcVgrlQmymnHIvdck5-g) for an example. 
