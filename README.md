@@ -32,6 +32,7 @@ Or do a dry run of the pipeline:
 In fact, all parameters passed to `StainedGlass.sh` are passed to `snakemake` so you can use all the `snakemake` command line options.
 
 Please try the test case with the default configuration file before submitting issues.
+If you are familiar with `snakemake` and want to trouble shoot yourself you can find the `Snakefile` in the directory `workflow`.
 
 ### Making figures for a small number of regions
 To make pdfs and pngs for a particular set of regions just add `make_figures` to your command.
