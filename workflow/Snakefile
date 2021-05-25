@@ -17,7 +17,7 @@ SM = config.pop("sample", "sample")
 W = config.pop("window", 5000)
 ALN_T = config.pop("alnthreads", 4)
 F = config.pop("mm_f", 10000)
-S = config.pop("mm_s", 1000)
+S = config.pop("mm_s", int(W / 5))
 
 #
 # required options
