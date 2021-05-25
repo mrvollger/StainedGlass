@@ -18,4 +18,5 @@ dependencies:
   - r-glue
   - r::r-rcolorbrewer
   - r::r-scales 
+  - r::r-ggplot2
   
