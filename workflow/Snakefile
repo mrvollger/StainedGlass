@@ -23,7 +23,7 @@ S = config.pop("mm_s", 1000)
 # required options
 #
 FASTA = os.path.abspath(config["fasta"])
-    
+
 FAI = FASTA + ".fai"
 if not os.path.exists(FAI):
     shell(f"samtools faidx {FASTA}")
@@ -35,6 +35,7 @@ N = min(N, N_WINDOWS)
 IDS = list(range(N))
 
 sys.stderr.write("N batches {} \n".format(N))
+
 
 localrules:
     merge_aln,
@@ -273,7 +274,8 @@ rule cooler_strand:
     shell:
         """
         cat {input.bed} | tail -n +2 \
-            | sed 's/\t+\t/\t100\t/g' | sed 's/\t-\t/\t50\t/g' \
+            | sed  's/+$/100/g' \
+            | sed  's/-$/50/g' \
               | cooler cload pairs \
                 -c1 1 -p1 2 -c2 4 -p2 5 \
                         --field count=8:agg=mean,dtype=float \
