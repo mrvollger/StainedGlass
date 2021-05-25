@@ -1,11 +1,13 @@
 import os
+import sys
 import pandas as pd
 import numpy as np
+from snakemake.utils import min_version
 
-SDIR = os.path.realpath(os.path.dirname(srcdir("env.cfg")))
-# shell.prefix(f"source {SDIR}/envs/env.cfg ; set -eo pipefail; ")
+min_version("6.0")
+
+SDIR = os.path.realpath(os.path.dirname(srcdir("Snakefile")))
 shell.prefix(f"set -eo pipefail; ")
-
 
 #
 # global options
