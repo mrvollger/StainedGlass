@@ -57,14 +57,36 @@ make_hist = function(sdf){
   p
 }
 
+diamond <- function( row ){
+  #side_length, x, y, color) {
+  #print(row)
+  side_length = as.numeric(row["window"])
+  x=as.numeric(row["w"])
+  y=as.numeric(row["z"])
+  
+  base <- matrix(c(1, 0, 0, 1, -1, 0, 0, -1), nrow = 2) * sqrt(2) / 2
+  trans <- (base * side_length) + c(x,y)
+  df = as.data.frame(t(trans))
+  colnames(df) = c("w","z")
+  df$discrete = as.numeric(row["discrete"])
+  df$group = as.numeric(row["group"])
+  df
+}
+
 make_tri = function(sdf, rname=""){
+  #sdf = read_bedpe("~/Desktop/repos/StainedGlass/results/chr8.2000.10000.bed")[`#query_name` == "chr8" & reference_name == "chr8"]
   sdf$w = (sdf$first_pos  + sdf$second_pos) 
   sdf$z = -sdf$first_pos + sdf$second_pos
   window = max(sdf$q_en - sdf$q_st)
   scale =  max(sdf$q_st)/max(sdf$w) 
-  
-  ggplot(sdf) +
-    geom_tile(aes(x = w*scale, y = z*window , fill = discrete)) + 
+  sdf$window = max(sdf$q_en - sdf$q_st)/scale
+  sdf$group = seq(nrow(sdf))
+  df.d = rbindlist(apply(sdf, 1, diamond ))
+  #df.d %>% summarise(max(w-z))
+  #ggplot(sdf) +
+    #geom_tile(aes(x = w*scale, y = z*window , fill = discrete)) + 
+  ggplot(df.d)+
+    geom_polygon(aes(x = w*scale, y = z*window , group=group, fill = factor(discrete))) + 
     theme_cowplot() + 
     scale_fill_brewer(palette = "Spectral", direction = -1) + 
     scale_x_continuous(labels=make_scale) +
@@ -77,6 +99,8 @@ make_tri = function(sdf, rname=""){
           axis.line.y = element_blank()) + 
     ggtitle(rname)
 }
+#sdf
+#rbindlist(apply(head(sdf), 1, diamond ))
 #t = df[r==df$r[1] & q_en < 1e6 & r_en < 1e6]
 #t = df[r == df$r[1]]
 #make_tri(t, rname="a")
