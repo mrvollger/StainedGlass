@@ -140,7 +140,7 @@ rule aln_prep:
 rule aln:
     input:
         ref=FASTA,
-        bed="temp/{SM}.{W}.{ID}.bed",
+        bed=temp("temp/{SM}.{W}.{ID}.bed"),
         split_ref=rules.aln_prep.output.split_ref_index,
     output:
         aln=temp("temp/{SM}.{W}.{F}.{ID}.bam"),
