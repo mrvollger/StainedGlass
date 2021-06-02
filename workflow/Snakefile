@@ -104,7 +104,7 @@ rule split_windows:
 rule window_fa:
     input:
         ref=FASTA,
-        bed=rules.make_windows.output.bed,
+        bed=temp(rules.make_windows.output.bed),
     output:
         fasta="results/{SM}.{W}.fasta",
     conda:
@@ -118,11 +118,30 @@ rule window_fa:
         """
 
 
+rule aln_prep:
+    input:
+        split_ref=rules.window_fa.output.fasta,
+    output:
+        split_ref_index=temp("results/{SM}.{W}.{F}.fasta.mmi"),
+    conda:
+        "envs/cooler.yaml"
+    threads: 1
+    resources:
+        mem=4,
+    shell:
+        """
+        minimap2 \
+            -f {wildcards.F} -s {S} -x ava-ont \
+             -d {output.split_ref_index} \
+            {input.split_ref} 
+        """
+
+
 rule aln:
     input:
         ref=FASTA,
         bed="temp/{SM}.{W}.{ID}.bed",
-        split_ref=rules.window_fa.output.fasta,
+        split_ref=rules.aln_prep.output.split_ref_index,
     output:
         aln=temp("temp/{SM}.{W}.{F}.{ID}.bam"),
     conda:

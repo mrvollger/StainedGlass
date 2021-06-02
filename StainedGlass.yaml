@@ -1,2 +1,7 @@
 sample: small
 fasta: test/small.fasta
+# Additional options 
+nbatch: 100
+window: 5000
+alnthreads: 4
+mm_f: 10000
