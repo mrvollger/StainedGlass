@@ -1,7 +1,7 @@
 sample: small
 fasta: test/small.fasta
 # Additional options 
-nbatch: 100
-window: 5000
-alnthreads: 4
-mm_f: 10000
+window: 5000 # size of the windows used in alignment
+nbatch: 100 # number of batches to split alignment jobs across
+alnthreads: 4 # number of alignment threads per batch
+mm_f: 10000 # minimap2 -f parameter

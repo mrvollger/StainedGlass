@@ -38,9 +38,23 @@ sys.stderr.write("N batches {} \n".format(N))
 
 
 localrules:
+    all,
     merge_aln,
     identity,
     pair_end_bed,
+    window_fa,
+    split_windows,
+    merge_list,
+    sort_aln,
+    identity,
+    pair_end_bed,
+    make_R_figures,
+    make_figures,
+    cooler,
+    cooler_identity,
+    cooler_strand,
+    cooler_zoomify_i,
+    cooler_zoomify_s,
 
 
 wildcard_constraints:

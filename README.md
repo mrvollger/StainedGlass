@@ -19,6 +19,11 @@ Choose a sample identifier for your run e.g. `chr8` and a fasta file on which yo
 ```
 sample: small
 fasta: test/small.fasta
+# Additional options 
+window: 5000 # size of the windows used in alignment
+nbatch: 100 # number of batches to split alignment jobs across
+alnthreads: 4 # number of alignment threads per batch
+mm_f: 10000 # minimap2 -f parameter
 ```
 
 Once this is done you can run the pipeline like so:
