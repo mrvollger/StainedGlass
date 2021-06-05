@@ -137,7 +137,7 @@ rule aln_prep:
     input:
         split_ref=rules.window_fa.output.fasta,
     output:
-        split_ref_index=temp("results/{SM}.{W}.{F}.fasta.mmi"),
+        split_ref_index=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.{{F}}.fasta.mmi"),
     conda:
         "envs/cooler.yaml"
     threads: 1
