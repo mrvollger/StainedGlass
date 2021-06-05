@@ -18,6 +18,7 @@ W = config.pop("window", 5000)
 ALN_T = config.pop("alnthreads", 4)
 F = config.pop("mm_f", 10000)
 S = config.pop("mm_s", int(W / 5))
+TEMP_DIR = config.pop("tempdir", "temp")
 
 #
 # required options
@@ -84,7 +85,7 @@ rule make_windows:
     input:
         fai=FAI,
     output:
-        bed=temp("temp/{SM}.{W}.bed"),
+        bed=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.bed"),
     conda:
         "envs/cooler.yaml"
     threads: 1
@@ -100,7 +101,7 @@ rule split_windows:
     input:
         bed=rules.make_windows.output.bed,
     output:
-        bed=temp(expand("temp/{{SM}}.{{W}}.{ID}.bed", ID=IDS)),
+        bed=temp(expand("{T}/{{SM}}.{{W}}.{ID}.bed", ID=IDS, T=TEMP_DIR)),
     threads: 1
     resources:
         mem=1,
@@ -108,7 +109,7 @@ rule split_windows:
         bed = open(input.bed).readlines()
         splits = np.array_split(np.arange(N_WINDOWS), N, axis=0)
         for i, split in enumerate(splits):
-            f = open(f"temp/{wildcards.SM}.{wildcards.W}.{i}.bed", "w+")
+            f = open(f"{TEMP_DIR}/{wildcards.SM}.{wildcards.W}.{i}.bed", "w+")
             for pos in split:
                 f.write(bed[pos])
             f.close()
@@ -118,7 +119,7 @@ rule split_windows:
 rule window_fa:
     input:
         ref=FASTA,
-        bed=temp(rules.make_windows.output.bed),
+        bed=rules.make_windows.output.bed,
     output:
         fasta="results/{SM}.{W}.fasta",
     conda:
@@ -154,10 +155,10 @@ rule aln_prep:
 rule aln:
     input:
         ref=FASTA,
-        bed=temp("temp/{SM}.{W}.{ID}.bed"),
+        bed=f"{TEMP_DIR}/{{SM}}.{{W}}.{{ID}}.bed",
         split_ref=rules.aln_prep.output.split_ref_index,
     output:
-        aln=temp("temp/{SM}.{W}.{F}.{ID}.bam"),
+        aln=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.{{F}}.{{ID}}.bam"),
     conda:
         "envs/cooler.yaml"
     threads: ALN_T
@@ -177,9 +178,9 @@ rule aln:
 
 rule merge_list:
     input:
-        aln=expand("temp/{{SM}}.{{W}}.{{F}}.{ID}.bam", ID=IDS),
+        aln=expand("{T}/{{SM}}.{{W}}.{{F}}.{ID}.bam", ID=IDS, T=TEMP_DIR),
     output:
-        alns=temp("temp/{SM}.{W}.{F}.list"),
+        alns=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.{{F}}.list"),
     threads: 1
     resources:
         mem=8,
@@ -191,7 +192,7 @@ rule merge_list:
 rule merge_aln:
     input:
         alns=rules.merge_list.output.alns,
-        aln=expand("temp/{{SM}}.{{W}}.{{F}}.{ID}.bam", ID=IDS),
+        aln=expand("{T}/{{SM}}.{{W}}.{{F}}.{ID}.bam", ID=IDS, T=TEMP_DIR),
         split_ref=rules.window_fa.output.fasta,
     output:
         aln=temp("results/{SM}.{W}.{F}.bam"),
