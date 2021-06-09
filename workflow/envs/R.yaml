@@ -15,3 +15,4 @@ dependencies:
   - cairo
   - xorg-libxt
   - numpy
+  - pandas
