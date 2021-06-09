@@ -4,6 +4,9 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - pandas
+  - numpy
+  - numba
   - cooler
   - minimap2
   - bedtools
@@ -19,4 +22,3 @@ dependencies:
   - r::r-rcolorbrewer
   - r::r-scales 
   - r::r-ggplot2
-  

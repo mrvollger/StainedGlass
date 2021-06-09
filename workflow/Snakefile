@@ -1,6 +1,5 @@
 import os
 import sys
-import pandas as pd
 import numpy as np
 from snakemake.utils import min_version
 
@@ -30,8 +29,8 @@ if not os.path.exists(FAI):
     shell(f"samtools faidx {FASTA}")
 
 
-df = pd.read_csv(FAI, names=["chr", "length", "x", "y", "z"], sep="\t")
-N_WINDOWS = int(sum(np.ceil(df["length"] / W)))
+lengths = np.array([int(line.split()[1]) for line in open(FAI).readlines()])
+N_WINDOWS = int(sum(np.ceil(lengths / W)))
 N = min(N, N_WINDOWS)
 IDS = list(range(N))
 
