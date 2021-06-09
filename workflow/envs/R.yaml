@@ -14,5 +14,6 @@ dependencies:
   - r::r-ggplot2
   - cairo
   - xorg-libxt
+  - xorg-libxaw
   - numpy
   - pandas
