@@ -4,6 +4,8 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - r-base>=4.0
+  - r-essentials
   - r::r-tidyverse
   - r-data.table
   - r-cowplot
@@ -12,10 +14,9 @@ dependencies:
   - r::r-rcolorbrewer
   - r::r-scales 
   - r::r-ggplot2
-  - r-cairo
-  - r-base
 #- cairo
 #- xorg-libxt
 #- xorg-libxaw
 #- numpy
 #- pandas
+#- r-cairo
