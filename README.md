@@ -7,11 +7,11 @@ This is a repository for making colorful dot-plots of genomic sequence.
 
 ## Installation 
 
-You will need a current version of `snakemake` to run the code and `numpy` installed in your python environment. To get `snakemake` please follow the install [instructions](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) on their website, but in brief once `conda` and `mamba` are installed you can install `snakemake` and `numpy` with:
+You will need a current version of `snakemake` to run this workflow. To get `snakemake` please follow the install [instructions](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) on their website, but in brief once `conda` and `mamba` are installed you can install `snakemake` with:
 ```
-mamba create -n snakemake -c conda-forge -c bioconda numpy snakemake
+mamba create -n snakemake -c conda-forge -c bioconda snakemake
 ```
-Afterwards you can activate the `conda` environment and download the repository after which all additional dependencies will be handled by `snakemake`.
+Afterwards you can activate the `conda` environment and download the repository. And all additional dependencies will be handled by `snakemake`.
 ```
 conda activate snakemake
 git clone https://github.com/mrvollger/StainedGlass.git

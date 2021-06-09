@@ -1,6 +1,6 @@
 import os
 import sys
-import numpy as np
+import math
 from snakemake.utils import min_version
 
 min_version("6.0")
@@ -31,8 +31,8 @@ if not os.path.exists(FAI):
 #
 # setup split and gather
 #
-lengths = np.array([int(line.split()[1]) for line in open(FAI).readlines()])
-N_WINDOWS = int(sum(np.ceil(lengths / W)))
+lengths = [ math.ceil(int(line.split()[1])/W)  for line in open(FAI).readlines()]
+N_WINDOWS = int(sum(lengths))
 N = min(N, N_WINDOWS)
 IDS = list(range(N))
 sys.stderr.write("N batches {} \n".format(N))
@@ -105,15 +105,10 @@ rule split_windows:
     threads: 1
     resources:
         mem=1,
-    run:
-        bed = open(input.bed).readlines()
-        splits = np.array_split(np.arange(N_WINDOWS), N, axis=0)
-        for i, split in enumerate(splits):
-            f = open(f"{TEMP_DIR}/{wildcards.SM}.{wildcards.W}.{i}.bed", "w+")
-            for pos in split:
-                f.write(bed[pos])
-            f.close()
-
+    shell:
+        """
+        {SDIR}/scripts/batch_bed_files.py {input.bed} --outputs {output.bed}
+        """
 
 
 rule window_fa:
