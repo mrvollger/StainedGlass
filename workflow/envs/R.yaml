@@ -5,6 +5,7 @@ channels:
   - defaults
 dependencies:
   - xorg-libx11
+  - xorg-libxau
   - r-base>=4.0
   - r-essentials
   - r-cairo
