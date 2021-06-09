@@ -12,5 +12,6 @@ dependencies:
   - r::r-rcolorbrewer
   - r::r-scales 
   - r::r-ggplot2
+  - cairo
   - xorg-libxt
   - numpy
