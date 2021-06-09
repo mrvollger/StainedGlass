@@ -4,6 +4,9 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - cooler
+  - numpy
+  - pandas
   - xorg-libx11
   - xorg-libxau
   - r-base>=4.0
