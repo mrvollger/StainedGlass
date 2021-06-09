@@ -7,10 +7,13 @@ This is a repository for making colorful dot-plots of genomic sequence.
 
 ## Installation 
 
-You will need a current version of `snakemake` to run the code. To get `snakemake` please follow the install [instructions](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) on their website.
-
-Afterwards you can download the repository and all additional dependencies will be handled by `snakemake`.
+You will need a current version of `snakemake` to run the code and `numpy` installed in your python environment. To get `snakemake` please follow the install [instructions](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) on their website, but in brief once `conda` and `mamba` are installed you can install `snakemake` and `numpy` with:
 ```
+mamba create -n snakemake -c conda-forge -c bioconda numpy snakemake
+```
+Afterwards you can activate the `conda` environment and download the repository after which all additional dependencies will be handled by `snakemake`.
+```
+conda activate snakemake
 git clone https://github.com/mrvollger/StainedGlass.git
 ```
 
@@ -19,14 +22,21 @@ Choose a sample identifier for your run e.g. `chr8` and a fasta file on which yo
 ```
 sample: small
 fasta: test/small.fasta
-# Additional options 
-window: 5000 # size of the windows used in alignment
-nbatch: 100 # number of batches to split alignment jobs across
-alnthreads: 4 # number of alignment threads per batch
-mm_f: 10000 # minimap2 -f parameter
+
+### Additional options 
+# Size of the windows used in alignment
+window: 5000 
+# The number of batches to split alignment jobs across
+nbatch: 100 
+# The number of alignment threads per batch
+alnthreads: 4 
+# Setting for the minimap2 -f parameter
+mm_f: 10000 
+# Path for a temp dir to be used by pipeline
+tempdir: temp 
 ```
 
-Once this is done you can run the pipeline like so:
+Once this is done this and activated your `conda` env with `snakemake` you can run the pipeline like so:
 ```
 ./StainedGlass.sh --cores 24 
 ```

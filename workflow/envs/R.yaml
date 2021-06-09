@@ -1,0 +1,14 @@
+name: R
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - r::r-tidyverse
+  - r-data.table
+  - r-cowplot
+  - r-argparse
+  - r-glue
+  - r::r-rcolorbrewer
+  - r::r-scales 
+  - r::r-ggplot2

@@ -20,20 +20,21 @@ S = config.pop("mm_s", int(W / 5))
 TEMP_DIR = config.pop("tempdir", "temp")
 
 #
-# required options
+# required arguments
 #
 FASTA = os.path.abspath(config["fasta"])
 
 FAI = FASTA + ".fai"
 if not os.path.exists(FAI):
-    shell(f"samtools faidx {FASTA}")
+    sys.exit(f"Input fasta must be indexed, try:\nsamtools faidx {FASTA}") 
 
-
+#
+# setup split and gather
+#
 lengths = np.array([int(line.split()[1]) for line in open(FAI).readlines()])
 N_WINDOWS = int(sum(np.ceil(lengths / W)))
 N = min(N, N_WINDOWS)
 IDS = list(range(N))
-
 sys.stderr.write("N batches {} \n".format(N))
 
 
@@ -86,7 +87,7 @@ rule make_windows:
     output:
         bed=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.bed"),
     conda:
-        "envs/cooler.yaml"
+        "envs/env.yaml"
     threads: 1
     resources:
         mem=1,
@@ -122,7 +123,7 @@ rule window_fa:
     output:
         fasta="results/{SM}.{W}.fasta",
     conda:
-        "envs/cooler.yaml"
+        "envs/env.yaml"
     threads: 1
     resources:
         mem=4,
@@ -138,7 +139,7 @@ rule aln_prep:
     output:
         split_ref_index=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.{{F}}.fasta.mmi"),
     conda:
-        "envs/cooler.yaml"
+        "envs/env.yaml"
     threads: 1
     resources:
         mem=4,
@@ -159,7 +160,7 @@ rule aln:
     output:
         aln=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.{{F}}.{{ID}}.bam"),
     conda:
-        "envs/cooler.yaml"
+        "envs/env.yaml"
     threads: ALN_T
     resources:
         mem=4,
@@ -196,7 +197,7 @@ rule merge_aln:
     output:
         aln=temp("results/{SM}.{W}.{F}.bam"),
     conda:
-        "envs/cooler.yaml"
+        "envs/env.yaml"
     threads: 4
     resources:
         mem=4,
@@ -214,7 +215,7 @@ rule sort_aln:
     output:
         aln="results/{SM}.{W}.{F}.sorted.bam",
     conda:
-        "envs/cooler.yaml"
+        "envs/env.yaml"
     threads: 8
     resources:
         mem=8,
@@ -231,7 +232,7 @@ rule identity:
     output:
         tbl=temp("results/{SM}.{W}.{F}.tbl"),
     conda:
-        "envs/cooler.yaml"
+        "envs/env.yaml"
     threads: 8
     resources:
         mem=8,
@@ -250,7 +251,7 @@ rule pair_end_bed:
         bed="results/{SM}.{W}.{F}.bed",
         full="results/{SM}.{W}.{F}.full.tbl",
     conda:
-        "envs/cooler.yaml"
+        "envs/env.yaml"
     threads: 1
     resources:
         mem=64,
@@ -273,7 +274,7 @@ rule make_R_figures:
         pdf="results/{SM}.{W}.{F}_figures/pdfs/{SM}.{W}.{F}.facet.all.pdf",
         png="results/{SM}.{W}.{F}_figures/pngs/{SM}.{W}.{F}.facet.all.png",
     conda:
-        "envs/cooler.yaml"
+        "envs/R.yaml"
     threads: 1
     resources:
         mem=64,
@@ -300,7 +301,7 @@ rule cooler_strand:
     output:
         cool="results/{SM}.{W}.{F}.strand.cool",
     conda:
-        "envs/cooler.yaml"
+        "envs/env.yaml"
     threads: 1
     resources:
         mem=64,
@@ -329,7 +330,7 @@ rule cooler_identity:
     output:
         cool="results/{SM}.{W}.{F}.identity.cool",
     conda:
-        "envs/cooler.yaml"
+        "envs/env.yaml"
     threads: 1
     resources:
         mem=64,
@@ -353,7 +354,7 @@ rule cooler_zoomify_i:
     output:
         i="results/{SM}.{W}.{F}.identity.mcool",
     conda:
-        "envs/cooler.yaml"
+        "envs/env.yaml"
     threads: 8
     resources:
         mem=8,
@@ -371,7 +372,7 @@ rule cooler_zoomify_s:
     output:
         s="results/{SM}.{W}.{F}.strand.mcool",
     conda:
-        "envs/cooler.yaml"
+        "envs/env.yaml"
     threads: 8
     resources:
         mem=8,
