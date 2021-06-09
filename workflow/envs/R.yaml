@@ -4,8 +4,10 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - xorg-libx11
   - r-base>=4.0
   - r-essentials
+  - r-cairo
   - r::r-tidyverse
   - r-data.table
   - r-cowplot
@@ -19,4 +21,3 @@ dependencies:
 #- xorg-libxaw
 #- numpy
 #- pandas
-#- r-cairo
