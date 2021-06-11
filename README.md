@@ -68,4 +68,12 @@ Making an interactive whole genome visualization requires the use of the program
 ```
 ./StainedGlass.sh --cores 24 cooler
 ```
+
+To view locally, use `higlass-manage`:
+
+```
+pip install higlass-manage
+higlass-manage view results/small.5000.10000.strand.mcool
+```
+
 See the [T2T CHM13 v1.0 StainedGlass](https://resgen.io/paper-data/T2T/views/MtjcVgrlQmymnHIvdck5-g) for an example. 
