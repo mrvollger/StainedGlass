@@ -1,5 +1,6 @@
 # StainedGlass
 [![Actions Status](https://github.com/mrvollger/StainedGlass/workflows/CI/badge.svg)](https://github.com/mrvollger/StainedGlass/actions) 
+[![Actions Status](https://github.com/mrvollger/StainedGlass/workflows/Linting/badge.svg)](https://github.com/mrvollger/StainedGlass/actions) 
 
 This is a repository for making colorful dot-plots of genomic sequence.
 ![](images/chr8.png "chr8 cen")
