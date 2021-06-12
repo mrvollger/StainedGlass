@@ -1,4 +1,5 @@
 .vscode/**
 .snakemake/**
 results/**
+logs/**
 stained_glass.code-workspace
