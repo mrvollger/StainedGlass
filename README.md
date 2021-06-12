@@ -21,7 +21,7 @@ git clone https://github.com/mrvollger/StainedGlass.git
 ## Running
 Choose a sample identifier for your run e.g. `chr8` and a fasta file on which you want to show the colorful alignments and the modify the config file `config/config.yaml` accordingly.
 
-Once this is done this and activated your `conda` env with `snakemake` you can run the pipeline like so:
+Once this is done and you have activated your `conda` env with `snakemake` you can run the pipeline like so:
 ```
 ./StainedGlass.sh --cores 24 
 ```
