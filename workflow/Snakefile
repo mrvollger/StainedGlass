@@ -15,13 +15,23 @@ configfile: "config/config.yaml"
 #
 # global options
 #
-N = config.pop("nbatch", 100)
+N = config.pop("nbatch", 1)
 SM = config.pop("sample", "sample")
 W = config.pop("window", 5000)
 ALN_T = config.pop("alnthreads", 4)
 F = config.pop("mm_f", 10000)
 S = config.pop("mm_s", int(W / 5))
 TEMP_DIR = config.pop("tempdir", "temp")
+
+
+if TEMP_DIR != "temp":
+    if os.path.exists("temp"):
+        if os.path.islink("temp") and os.abspath("temp") == TEMP_DIR:
+            shell("ln -s {TEMP_DIR} temp")
+        else:
+            sys.exit("temp/ already in use, please move it before running.")
+    else:
+        shell("ln -s {TEMP_DIR} temp")
 
 #
 # required arguments
@@ -89,7 +99,7 @@ rule make_windows:
     input:
         fai=FAI,
     output:
-        bed=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.bed"),
+        bed=temp("temp/{SM}.{W}.bed"),
     log:
         "logs/make_windows.{SM}.{W}.log",
     conda:
@@ -107,7 +117,7 @@ rule split_windows:
     input:
         bed=rules.make_windows.output.bed,
     output:
-        bed=temp(expand("{T}/{{SM}}.{{W}}.{ID}.bed", ID=IDS, T=TEMP_DIR)),
+        bed=temp(expand("temp/{SM}.{W}.{ID}.bed", ID=IDS, allow_missing=True)),
     threads: 1
     conda:
         "envs/env.yaml"
@@ -146,7 +156,7 @@ rule aln_prep:
     input:
         split_ref=rules.window_fa.output.fasta,
     output:
-        split_ref_index=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.{{F}}.fasta.mmi"),
+        split_ref_index=temp("temp/{SM}.{W}.{F}.fasta.mmi"),
     conda:
         "envs/env.yaml"
     log:
@@ -168,10 +178,10 @@ rule aln_prep:
 rule aln:
     input:
         ref=FASTA,
-        bed=f"{TEMP_DIR}/{{SM}}.{{W}}.{{ID}}.bed",
+        bed="temp/{SM}.{W}.{ID}.bed",
         split_ref=rules.aln_prep.output.split_ref_index,
     output:
-        aln=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.{{F}}.{{ID}}.bam"),
+        aln=temp("temp/{SM}.{W}.{F}.{ID}.bam"),
     conda:
         "envs/env.yaml"
     log:
@@ -195,9 +205,9 @@ rule aln:
 
 rule merge_list:
     input:
-        aln=expand("{T}/{{SM}}.{{W}}.{{F}}.{ID}.bam", ID=IDS, T=TEMP_DIR),
+        aln=expand("temp/{SM}.{W}.{F}.{ID}.bam", ID=IDS, allow_missing=True),
     output:
-        alns=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.{{F}}.list"),
+        alns=temp("temp/{SM}.{W}.{F}.list"),
     threads: 1
     log:
         "logs/merge_list.{SM}.{W}.{F}.log",
@@ -207,11 +217,10 @@ rule merge_list:
         open(output.alns, "w").write("\n".join(input.aln) + "\n")
 
 
-
 rule merge_aln:
     input:
         alns=rules.merge_list.output.alns,
-        aln=expand("{T}/{{SM}}.{{W}}.{{F}}.{ID}.bam", ID=IDS, T=TEMP_DIR),
+        aln=expand("temp/{SM}.{W}.{F}.{ID}.bam", ID=IDS, allow_missing=True),
         split_ref=rules.window_fa.output.fasta,
     output:
         aln=temp("results/{SM}.{W}.{F}.bam"),
