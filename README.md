@@ -45,7 +45,7 @@ To make pdfs and pngs for a particular set of regions just add `make_figures` to
 ### Output
 The file `results/{sample}.{\d+}.{\d+}.bed` will contain all the alignments identified by the pipeline, and is the main input for figure generation. Under the same prefix there will also be a bam file that contains the unprocessed alignments. Note the bam will contain additional alignments not present in the bed file because redundant alignments with lower scores are removed in the figures.
 
-If you ran the pipeline with `make_figures` then there will be an an output directory under `results/{SM}.{\d+}.{\d+}_figures` with a variety of dot plots in `pdf` and `png` format. 
+If you ran the pipeline with `make_figures` then there will be an an output directory under `results/{sample}.{\d+}.{\d+}_figures` with a variety of dot plots in `pdf` and `png` format. 
 
 If you see `tri.TRUE` in the output pdf/png it means that the dot plot is rotated and cropped into a triangle. If you see `onecolorscale.FALSE` it means that between different facets in the same plot different color scales are being used. 
 
