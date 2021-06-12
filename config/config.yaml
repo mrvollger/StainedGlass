@@ -1,5 +1,5 @@
 sample: small
-fasta: test/small.fasta
+fasta: .test/small.fasta
 
 ### Additional options 
 # Size of the windows used in alignment
