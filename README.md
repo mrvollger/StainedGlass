@@ -18,23 +18,7 @@ git clone https://github.com/mrvollger/StainedGlass.git
 ```
 
 ## Running
-Choose a sample identifier for your run e.g. `chr8` and a fasta file on which you want to show the colorful alignments and the modify the config file `StainedGlass.yaml` accordingly.
-```
-sample: small
-fasta: test/small.fasta
-
-### Additional options 
-# Size of the windows used in alignment
-window: 5000 
-# The number of batches to split alignment jobs across
-nbatch: 100 
-# The number of alignment threads per batch
-alnthreads: 4 
-# Setting for the minimap2 -f parameter
-mm_f: 10000 
-# Path for a temp dir to be used by pipeline
-tempdir: temp 
-```
+Choose a sample identifier for your run e.g. `chr8` and a fasta file on which you want to show the colorful alignments and the modify the config file `config/config.yaml` accordingly.
 
 Once this is done this and activated your `conda` env with `snakemake` you can run the pipeline like so:
 ```
@@ -48,6 +32,8 @@ In fact, all parameters passed to `StainedGlass.sh` are passed to `snakemake` so
 
 Please try the test case with the default configuration file before submitting issues.
 If you are familiar with `snakemake` and want to trouble shoot yourself you can find the `Snakefile` in the directory `workflow`.
+
+Descriptions of additional configuration parameters can be found in `config/README.md`.
 
 ### Making figures for a small number of regions
 To make pdfs and pngs for a particular set of regions just add `make_figures` to your command.
