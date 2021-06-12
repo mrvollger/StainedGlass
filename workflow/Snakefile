@@ -8,6 +8,10 @@ min_version("6.0")
 SDIR = os.path.realpath(os.path.dirname(srcdir("Snakefile")))
 shell.prefix(f"set -eo pipefail; ")
 
+
+configfile: "config/config.yaml"
+
+
 #
 # global options
 #
@@ -24,14 +28,14 @@ TEMP_DIR = config.pop("tempdir", "temp")
 #
 FASTA = os.path.abspath(config["fasta"])
 
-FAI = FASTA + ".fai"
+FAI = f"{FASTA}.fai"
 if not os.path.exists(FAI):
-    sys.exit(f"Input fasta must be indexed, try:\nsamtools faidx {FASTA}") 
+    sys.exit(f"Input fasta must be indexed, try:\nsamtools faidx {FASTA}")
 
 #
 # setup split and gather
 #
-lengths = [ math.ceil(int(line.split()[1])/W)  for line in open(FAI).readlines()]
+lengths = [math.ceil(int(line.split()[1]) / W) for line in open(FAI).readlines()]
 N_WINDOWS = int(sum(lengths))
 N = min(N, N_WINDOWS)
 IDS = list(range(N))
@@ -59,7 +63,7 @@ localrules:
 
 
 wildcard_constraints:
-    ID="\d+",
+    ID="|".join(map(str, IDS)),
     SM=SM,
     W=W,
     F=F,
@@ -86,6 +90,8 @@ rule make_windows:
         fai=FAI,
     output:
         bed=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.bed"),
+    log:
+        "logs/make_windows.{SM}.{W}.log",
     conda:
         "envs/env.yaml"
     threads: 1
@@ -93,7 +99,7 @@ rule make_windows:
         mem=1,
     shell:
         """
-        bedtools makewindows -g {input.fai} -w {W} > {output.bed}
+        bedtools makewindows -g {input.fai} -w {wildcards.W} > {output.bed}
         """
 
 
@@ -103,11 +109,17 @@ rule split_windows:
     output:
         bed=temp(expand("{T}/{{SM}}.{{W}}.{ID}.bed", ID=IDS, T=TEMP_DIR)),
     threads: 1
+    conda:
+        "envs/env.yaml"
+    log:
+        "logs/split_windows.{SM}.{W}.log",
     resources:
         mem=1,
+    params:
+        sdir=SDIR,
     shell:
         """
-        {SDIR}/scripts/batch_bed_files.py {input.bed} --outputs {output.bed}
+        {params.sdir}/scripts/batch_bed_files.py {input.bed} --outputs {output.bed}
         """
 
 
@@ -119,6 +131,8 @@ rule window_fa:
         fasta="results/{SM}.{W}.fasta",
     conda:
         "envs/env.yaml"
+    log:
+        "logs/window_fa.{SM}.{W}.log",
     threads: 1
     resources:
         mem=4,
@@ -135,13 +149,17 @@ rule aln_prep:
         split_ref_index=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.{{F}}.fasta.mmi"),
     conda:
         "envs/env.yaml"
+    log:
+        "logs/aln_pref.{SM}.{W}.{F}.log",
     threads: 1
+    params:
+        S=S,
     resources:
         mem=4,
     shell:
         """
         minimap2 \
-            -f {wildcards.F} -s {S} -x ava-ont \
+            -f {wildcards.F} -s {params.S} -x ava-ont \
              -d {output.split_ref_index} \
             {input.split_ref} 
         """
@@ -156,13 +174,17 @@ rule aln:
         aln=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.{{F}}.{{ID}}.bam"),
     conda:
         "envs/env.yaml"
+    log:
+        "logs/aln.{SM}.{W}.{F}.{ID}.log",
     threads: ALN_T
+    params:
+        S=S,
     resources:
         mem=4,
     shell:
         """
         minimap2 \
-            -t {threads} -f {wildcards.F} -s {S} \
+            -t {threads} -f {wildcards.F} -s {params.S} \
             -ax ava-ont --dual=yes --eqx \
             {input.split_ref} \
             <( bedtools getfasta -fi {input.ref} -bed {input.bed} ) \
@@ -177,10 +199,12 @@ rule merge_list:
     output:
         alns=temp(f"{TEMP_DIR}/{{SM}}.{{W}}.{{F}}.list"),
     threads: 1
+    log:
+        "logs/merge_list.{SM}.{W}.{F}.log",
     resources:
         mem=8,
     run:
-        open(output.alns, "w+").write("\n".join(input.aln) + "\n")
+        open(output.alns, "w").write("\n".join(input.aln) + "\n")
 
 
 
@@ -193,6 +217,8 @@ rule merge_aln:
         aln=temp("results/{SM}.{W}.{F}.bam"),
     conda:
         "envs/env.yaml"
+    log:
+        "logs/merge_aln.{SM}.{W}.{F}.log",
     threads: 4
     resources:
         mem=4,
@@ -211,6 +237,8 @@ rule sort_aln:
         aln="results/{SM}.{W}.{F}.sorted.bam",
     conda:
         "envs/env.yaml"
+    log:
+        "logs/sort_aln.{SM}.{W}.{F}.log",
     threads: 8
     resources:
         mem=8,
@@ -229,11 +257,16 @@ rule identity:
     conda:
         "envs/env.yaml"
     threads: 8
+    params:
+        sdir=SDIR,
+        S=S,
+    log:
+        "logs/identity.{SM}.{W}.{F}.log",
     resources:
         mem=8,
     shell:
         """
-        {SDIR}/scripts/samIdentity.py --matches {S} --header \
+        {params.sdir}/scripts/samIdentity.py --matches {params.S} --header \
           {input.aln} > {output.tbl}
         """
 
@@ -248,11 +281,15 @@ rule pair_end_bed:
     conda:
         "envs/env.yaml"
     threads: 1
+    log:
+        "logs/pair_end_bed.{SM}.{W}.{F}.log",
     resources:
         mem=64,
+    params:
+        sdir=SDIR,
     shell:
         """
-        {SDIR}/scripts/refmt.py \
+        {params.sdir}/scripts/refmt.py \
             --window {wildcards.W} --fai {input.fai} \
             --full {output.full} \
             {input.tbl} {output.bed}
@@ -271,11 +308,15 @@ rule make_R_figures:
     conda:
         "envs/R.yaml"
     threads: 1
+    log:
+        "logs/make_R_figures.{SM}.{W}.{F}.log",
+    params:
+        sdir=SDIR,
     resources:
         mem=64,
     shell:
         """
-        Rscript {SDIR}/scripts/aln_plot.R \
+        Rscript {params.sdir}/scripts/aln_plot.R \
             --bed {input.bed} \
             --prefix {wildcards.SM}.{wildcards.W}.{wildcards.F}
         """
@@ -298,6 +339,8 @@ rule cooler_strand:
     conda:
         "envs/env.yaml"
     threads: 1
+    log:
+        "logs/cooler_strand.{SM}.{W}.{F}.log",
     resources:
         mem=64,
     shell:
@@ -326,6 +369,8 @@ rule cooler_identity:
         cool="results/{SM}.{W}.{F}.identity.cool",
     conda:
         "envs/env.yaml"
+    log:
+        "logs/cooler_identity.{SM}.{W}.{F}.log",
     threads: 1
     resources:
         mem=64,
@@ -351,6 +396,8 @@ rule cooler_zoomify_i:
     conda:
         "envs/env.yaml"
     threads: 8
+    log:
+        "logs/cooler_identity_i.{SM}.{W}.{F}.log",
     resources:
         mem=8,
     shell:
@@ -368,6 +415,8 @@ rule cooler_zoomify_s:
         s="results/{SM}.{W}.{F}.strand.mcool",
     conda:
         "envs/env.yaml"
+    log:
+        "logs/cooler_identity_s.{SM}.{W}.{F}.log",
     threads: 8
     resources:
         mem=8,
