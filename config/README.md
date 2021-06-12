@@ -8,7 +8,9 @@ window: 5000
 
 Setting for the minimap2 `-f` parameter. A smaller number will increase sensitivity at the cost of runtime.
 See the `minimap2` man page for more details.
+```
 mm_f: 10000 
+```
 
 The number of alignment jobs to distribute the workflow across. Does not change final output.
 ```
