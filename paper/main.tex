@@ -49,7 +49,8 @@ and is available open source under the MIT license at
 \maketitle
 
 \section{Introduction}
-Dot plots are a useful way to show sequence similarity... 
+Dot plots are a powerful way to show sequence similarity that often reveal the underlying 
+structures of complex repeats. 
 
 However, with increasingly contiguous assemblies of reference genomes (VGP) and complete human chromosomes (chr8, chrX, T2T) repeat structures including centromeres and other hererochromatic arrays are now for the first time available for analysis. The size and complexity of these structures, often many megabase pairs in humans, elude traditional dot plots for two reasons: 1) current visualization methods are largely based on perfect k-mer matches which do not lend themselves to the expected gaps and mismatches between large repeats, and 2) for tandem arrays of consisting of megabases of sequence dot plots are often just black squares that relay little information other the the size and presence of sequence similarity. 
 
@@ -95,7 +96,11 @@ Figure~\ref{fig:01}
 
 
 \section{Conclusion}
-Rust-Bio is a general purpose bioinformatics library. Building on the innovative Rust programming language, Rust-Bio combines memory safety with speed, complemented by rigorous continuous integration tests. So far, a wide set of algorithms and data structures for biological sequences is provided, ranging from index data structures to pattern matching and alignment, complemented by readers and writers for common file formats.
+StainedGlass is a visualization tool for large genomic repeats and building
+on snakemake makes StainedGlass both reproducible and scalable at the whole
+genome level.
+The output visualizations produced by StainedGlass are publication ready while also 
+providing an option for interactive data exploration through the use of HiGlass.
 
 \section*{Acknowledgements}
 The authors thank T. Brown for help in editing this manuscript 
