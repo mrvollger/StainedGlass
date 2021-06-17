@@ -49,20 +49,49 @@ and is available open source under the MIT license at
 \maketitle
 
 \section{Introduction}
-Dot plots are a powerful way to show sequence similarity that often reveal the underlying 
-structures of complex repeats. 
 
-However, with increasingly contiguous assemblies of reference genomes (VGP) and complete human chromosomes (chr8, chrX, T2T) repeat structures including centromeres and other hererochromatic arrays are now for the first time available for analysis. The size and complexity of these structures, often many megabase pairs in humans, elude traditional dot plots for two reasons: 1) current visualization methods are largely based on perfect k-mer matches which do not lend themselves to the expected gaps and mismatches between large repeats, and 2) for tandem arrays of consisting of megabases of sequence dot plots are often just black squares that relay little information other the the size and presence of sequence similarity. 
+Dot plots are a powerful way to show sequence similarity that often reveal the
+underlying structures of complex repeats. 
+\\
+However, with increasingly contiguous assemblies of reference genomes (VGP) and
+complete human chromosomes (chr8, chrX, T2T) repeat structures including
+centromeres and other heterochromatic arrays are now for the first time
+available for analysis. The size and complexity of these structures, often many
+megabase pairs in humans, elude traditional dot plots for two reasons: 1)
+current visualization methods are largely based on perfect or k-mer matches
+which do not lend themselves to the expected gaps and mismatches between large
+repeats, and 2) for tandem arrays of consisting of megabases of sequence dot
+plots are often just black squares that relay little information other than the
+size and presence of sequence similarity. 
 
-In order to examine the centromere in human chr8 a colored dot plot based on sequence alignment rather than small k-mers was designed which allowed the authors to make a model for centomere evolution.  
+In order to examine the centromere of human chromosome eight a colored dot plot based on
+sequence alignment rather than small k-mers was designed which allowed the
+authors to make a model for centromere evolution. In this work, we present StainedGlass, which generalizes the idea of colored dot
+plots based on sequence alignment and provides an easy, scalable, and
+customizable workflow so that it can be applied to new genomes. 
 
-In this work, we present StainedGlass, which generalizes the idea of colored dot plots based on sequence alignment and provides an easy, scale-able, and customize-able workflow so that it can be applied to new genomes. 
+\section{Methods}
+To generate pairwise sequence identity dot-plots for StainedGlass the input 
+sequence is fragmented into windows of a preset size (default 5 kbp) and then 
+all possible pairwise alignments between the fragments are calculated using
+minimap2 with the parameters -ax ava-ont. The color used in the dot-plot is
+determined by the sequence identity of the alignment which is calculated as:
+$$ ID = 100 \biggl( \frac{M}{M+X+I+D} \biggr) $$
+where $ID$ is the percent sequence identity, $M$ the number of matches,
+$X$ the number of mismatches, $I$ the number of insertion events, and $D$ 
+the number of deletion events. When there are multiple alignments between the same two fragments of sequences
+all alignments other than the one with the most matches are filtered out
+regardless of their sequence identity.
+
+The resulting matrix of percent identity scores can then be visualized using either static figures, or with HiGlass which allows for interactive data exploration. The static figures are more appropriate for visualization of 
+relatively small regions (30 Mbp or less) at publication quality while the
+HiGlass visualization is better for data exploration of whole genome alignments.
+
+The tool is made available using snakemake which allows for reproducible and scalable data analyses. The stability of new changes are automatically tested with each new change using continuous integration via github actions.
 
 \section{Usage and examples}
 \citealp{Boffelli03} example cite
 \\
-The tool is made available using snakemake which allows for reproducible and scalable data analyses.
-Additionally, stability of new changes is automatically tested with each new change with continuous integration via github actions.
 
 % \begin{itemize}
 % \item for bulleted list, use itemize
