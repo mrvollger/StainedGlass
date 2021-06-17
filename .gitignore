@@ -3,3 +3,10 @@
 results/**
 logs/**
 stained_glass.code-workspace
+paper/**_latex**
+paper/main.aux
+paper/main.dvi
+paper/main.fls
+paper/main.log
+paper/main.synctex.gz
+paper/tmp/**
