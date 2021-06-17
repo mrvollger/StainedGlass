@@ -1,6 +1,4 @@
 usage:
-  mandatory-flags: # optional definition of additional flags
-    flags: "--use-conda" # put your flags here
   software-stack-deployment: # definition of software deployment method (at least one of conda, singularity, or singularity+conda)
     conda: true 
   report: true 
