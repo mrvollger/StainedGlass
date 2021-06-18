@@ -1,7 +1,9 @@
-\documentclass{bioinfo}
+\documentclass[nocrop]{bioinfo}
 \usepackage{listings}
+\usepackage{graphicx}
 %\usepackage{xurl}
-%\usepackage{hyperref}
+\let\href\undefined
+\usepackage{hyperref}
 
 \copyrightyear{2021} \pubyear{2021}
 
@@ -46,13 +48,15 @@ we introduce StainedGlass which can generate publication quality figures
 that communicate the identity and orientation of 
 multi-megabase repeats while scaling to entire genomes. \\
 \textbf{Availability and implementation:} 
-StainedGlass is implemented using \href{snakemake.github.io}{snakemake}
+StainedGlass is implemented using \href{https://snakemake.github.io}{snakemake}
 and is available open source under the MIT license at 
-\href{mrvollger.github.io/StainedGlass}{mrvollger.github.io/StainedGlass/}.\\
+\href{https://mrvollger.github.io/StainedGlass}{mrvollger.github.io/StainedGlass/}.\\
 \textbf{Contact:} \href{mvollger@uw.edu}{mvollger@uw.edu}\\
 }
 
 \maketitle
+
+
 
 \section{Introduction}
 Dot plots are a powerful way to show sequence similarity that often reveal the
@@ -79,7 +83,7 @@ customizable workflow so that it can be applied to new genomes.
 %%--------------------------------------------------------------------------%%
 \begin{figure}[!tpb]%figure1
 \centerline{
-	\includegraphics[width=0.5\textwidth,keepaspectratio]{../images/chr8.png}
+	\includegraphics[width=0.5\textwidth,keepaspectratio]{figure1.png}
 }
 \caption{Output from StainedGlass showing the sequence identity within human
 chromosome 8.}
@@ -112,9 +116,9 @@ The tool is made available using snakemake
 reproducible and scalable data analyses. The stability of new changes are
 automatically tested with each new change using continuous integration via
 github actions. Finally, StainedGlass is
-\href{snakemake.github.io/snakemake-workflow-catalog?rules=true}{snakemake
+\href{https://snakemake.github.io/snakemake-workflow-catalog?rules=true}{snakemake
 standard compliant} so it has automated
-\href{snakemake.github.io/snakemake-workflow-catalog?usage=mrvollger/StainedGlass}{usage
+\href{https://snakemake.github.io/snakemake-workflow-catalog?usage=mrvollger/StainedGlass}{usage
 documentation}.
 
 \section{Usage and examples}
@@ -130,13 +134,13 @@ To generate the static figures you can add make\_figures to the command.
 \end{lstlisting}
 
 StainedGlass can also be used to make
-\href{github.com/open2c/cooler}{cooler} files that can be loaded into
+\href{https://github.com/open2c/cooler}{cooler} files that can be loaded into
 HiGlass for whole genome visualizations.
 \begin{lstlisting} 
 	snakemake --use-conda --cores 4 cooler
 \end{lstlisting} 
 An example of this interactive browser for the telomere to telomere assembly of CHM13 can be found at 
-\href{resgen.io/paper-data/T2T/views/MtjcVgrlQmymnHIvdck5-g}{resgen.io}.
+\href{https://resgen.io/paper-data/T2T/views/MtjcVgrlQmymnHIvdck5-g}{resgen.io}.
 
 \section{Conclusion}
 
