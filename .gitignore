@@ -10,3 +10,5 @@ paper/main.fls
 paper/main.log
 paper/main.synctex.gz
 paper/tmp/**
+paper/main.bbl
+paper/main.blg
