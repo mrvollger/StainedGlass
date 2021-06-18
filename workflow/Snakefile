@@ -26,8 +26,10 @@ TEMP_DIR = config.pop("tempdir", "temp")
 
 if TEMP_DIR != "temp":
     if os.path.exists("temp"):
-        if os.path.islink("temp") and os.path.abspath("temp") == TEMP_DIR:
-            shell("ln -s {TEMP_DIR} temp")
+        if os.path.islink("temp") and os.path.realpath("temp") == os.path.realpath(
+            TEMP_DIR
+        ):
+            print("The temp dir has already been linked.")
         else:
             sys.exit("temp/ already in use, please move it before running.")
     else:
