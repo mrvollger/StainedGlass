@@ -457,3 +457,41 @@
   year     = 2018,
   language = {en}
 }
+
+@article{Abdennur2020-lz,
+  title    = {Cooler: scalable storage for {Hi-C} data and other genomically
+              labeled arrays},
+  author   = {Abdennur, Nezar and Mirny, Leonid A},
+  abstract = {MOTIVATION: Most existing coverage-based (epi)genomic datasets
+              are one-dimensional, but newer technologies probing interactions
+              (physical, genetic, etc.) produce quantitative maps with
+              two-dimensional genomic coordinate systems. Storage and
+              computational costs mount sharply with data resolution when such
+              maps are stored in dense form. Hence, there is a pressing need to
+              develop data storage strategies that handle the full range of
+              useful resolutions in multidimensional genomic datasets by taking
+              advantage of their sparse nature, while supporting efficient
+              compression and providing fast random access to facilitate
+              development of scalable algorithms for data analysis. RESULTS: We
+              developed a file format called cooler, based on a sparse data
+              model, that can support genomically labeled matrices at any
+              resolution. It has the flexibility to accommodate various
+              descriptions of the data axes (genomic coordinates, tracks and
+              bin annotations), resolutions, data density patterns and
+              metadata. Cooler is based on HDF5 and is supported by a Python
+              library and command line suite to create, read, inspect and
+              manipulate cooler data collections. The format has been adopted
+              as a standard by the NIH 4D Nucleome Consortium. AVAILABILITY AND
+              IMPLEMENTATION: Cooler is cross-platform, BSD-licensed and can be
+              installed from the Python package index or the bioconda
+              repository. The source code is maintained on Github at
+              https://github.com/mirnylab/cooler. SUPPLEMENTARY INFORMATION:
+              Supplementary data are available at Bioinformatics online.},
+  journal  = {Bioinformatics},
+  volume   = 36,
+  number   = 1,
+  pages    = {311--316},
+  month    = jan,
+  year     = 2020,
+  language = {en}
+}
