@@ -1,15 +1,22 @@
-\documentclass[nocrop]{bioinfo}
+\documentclass[nocrop, noinfo]{bioinfo}
 \usepackage{listings}
 \usepackage{graphicx}
+\usepackage{xcolor}
 %\usepackage{xurl}
 \let\href\undefined
-\usepackage{hyperref}
+\usepackage[
+	colorlinks = true,
+	linkcolor = blue,
+	urlcolor  = blue,
+	citecolor = brown,
+	anchorcolor = blue
+	]{hyperref}
 
 \copyrightyear{2021} \pubyear{2021}
 
 \lstset{frame=tb, language=bash}
 
-\access{Advance Access Publication Date: Day Month Year}
+\access{}%Advance Access Publication Date: Day Month Year}
 \appnotes{Applications Note}
 
 \begin{document}
