@@ -63,8 +63,9 @@ and is available open source under the MIT license at
 
 \maketitle
 
-
-
+%------------------------------------------------------------------------%
+%-------------------------------SECTION----------------------------------%
+%------------------------------------------------------------------------%
 \section{Introduction}
 Dot plots are a powerful way to show sequence similarity that often reveal the
 underlying structures of complex repeats. However, with increasingly contiguous
@@ -86,6 +87,9 @@ In this work, we present StainedGlass, which generalizes the idea of colored dot
 plots based on sequence alignment and provides an easy, scalable, and
 customizable workflow so that it can be applied to new genomes. 
 
+%------------------------------------------------------------------------%
+%-------------------------------SECTION----------------------------------%
+%------------------------------------------------------------------------%
 \section{Methods} 
 %%--------------------------------------------------------------------------%%
 \begin{figure}[!tpb]%figure1
@@ -122,11 +126,10 @@ The tool is made available using snakemake
 (\citealp{Koster2012-fs,Koster2018-ef,Molder2021-xm}) which allows for
 reproducible and scalable data analyses. The stability of new changes are
 automatically tested with each new change using continuous integration via
-github actions. Finally, StainedGlass is
-\href{https://snakemake.github.io/snakemake-workflow-catalog?rules=true}{snakemake
-standard compliant} so it has automated
-\href{https://snakemake.github.io/snakemake-workflow-catalog?usage=mrvollger/StainedGlass}{usage
-documentation}.
+github actions. Finally, StainedGlass is a snakemake
+\href{https://snakemake.github.io/snakemake-workflow-catalog?rules=true}{
+standard compliant} workflow and therefor has automated
+\href{https://snakemake.github.io/snakemake-workflow-catalog?usage=mrvollger/StainedGlass}{usage} documentation.
 
 \section{Usage and examples}
 To generate the alignments for StainedGlass you can
@@ -149,6 +152,9 @@ HiGlass for whole genome visualizations.
 An example of this interactive browser for the telomere to telomere assembly of CHM13 can be found at 
 \href{https://resgen.io/paper-data/T2T/views/MtjcVgrlQmymnHIvdck5-g}{resgen.io}.
 
+%------------------------------------------------------------------------%
+%-------------------------------SECTION----------------------------------%
+%------------------------------------------------------------------------%
 \section{Conclusion}
 
 StainedGlass is a visualization tool for large genomic repeats and building on
@@ -157,6 +163,9 @@ level. The output visualizations produced by StainedGlass are publication ready
 while also providing an option for interactive data exploration through the use
 of HiGlass.
 
+%------------------------------------------------------------------------%
+%-------------------------------SECTION----------------------------------%
+%------------------------------------------------------------------------%
 \section*{Acknowledgements} The authors thank T. Brown for help in editing this
 manuscript and G. A. Logsdon for aesthetic suggestions.
 
@@ -167,11 +176,10 @@ National Institutes of Health (A.M.P.) and grants from the U.S. National Institu
 Health (NIH grants 5R01HG002385 to E.E.E.; 5U01HG010971 to E.E.E.; and 1U01HG010973 to
 E.E.E.). E.E.E. is an investigator of the Howard Hughes Medical Institute.
 
-%\bibliographystyle{achemnat}
-%\bibliographystyle{plainnat}
-%\bibliographystyle{abbrv}
-%\bibliographystyle{plain}
 
+%------------------------------------------------------------------------%
+%-------------------------------SECTION----------------------------------%
+%------------------------------------------------------------------------%
 \bibliographystyle{natbib}
 \bibliography{StainedGlass}
 
