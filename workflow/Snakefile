@@ -1,6 +1,7 @@
+import math
 import os
 import sys
-import math
+
 from snakemake.utils import min_version
 
 min_version("6.0")
@@ -11,13 +12,14 @@ shell.prefix(f"set -eo pipefail; ")
 
 configfile: "config/config.yaml"
 
-
 #
 # global options
 #
 N = config.pop("nbatch", 1)
+NUM_DUPS=config.pop("num_dups", 100)
 SM = config.pop("sample", "sample")
 W = config.pop("window", 5000)
+CW=config.pop('cooler_window', int(W))
 ALN_T = config.pop("alnthreads", 4)
 F = config.pop("mm_f", 10000)
 S = config.pop("mm_s", int(W / 5))
@@ -54,6 +56,8 @@ sys.stderr.write("N batches {} \n".format(N))
 
 localrules:
     all,
+    bwa_index,
+    bwa_aln,
     merge_aln,
     identity,
     pair_end_bed,
@@ -86,13 +90,13 @@ rule all:
         beds=expand("results/{SM}.{W}.{F}.bed", SM=SM, W=W, F=F),
         fulls=expand("results/{SM}.{W}.{F}.full.tbl", SM=SM, W=W, F=F),
 
-
 rule cooler:
     input:
-        cool_s=expand("results/{SM}.{W}.{F}.strand.cool", SM=SM, W=W, F=F),
-        cool_i=expand("results/{SM}.{W}.{F}.identity.cool", SM=SM, W=W, F=F),
-        cool_sm=expand("results/{SM}.{W}.{F}.strand.mcool", SM=SM, W=W, F=F),
-        cool_im=expand("results/{SM}.{W}.{F}.identity.mcool", SM=SM, W=W, F=F),
+        cool_d = expand("results/{SM}.{W}.{CW}.density.mcool", SM=SM, W=W, CW=CW)
+        # cool_s=expand("results/{SM}.{W}.{F}.strand.cool", SM=SM, W=W, F=F),
+        # cool_i=expand("results/{SM}.{W}.{F}.identity.cool", SM=SM, W=W, F=F),
+        # cool_sm=expand("results/{SM}.{W}.{F}.strand.mcool", SM=SM, W=W, F=F),
+        # cool_im=expand("results/{SM}.{W}.{F}.identity.mcool", SM=SM, W=W, F=F),
 
 
 rule make_windows:
@@ -105,7 +109,7 @@ rule make_windows:
     conda:
         "envs/env.yaml"
     threads: 1
-    resources:
+    resources: 
         mem=1,
     shell:
         """
@@ -434,4 +438,86 @@ rule cooler_zoomify_s:
         cooler zoomify --field count:agg=mean,dtype=float {input.s} \
                 -n {threads} \
              -o {output.s}
+        """
+
+rule bwa_index:
+    input:
+        fasta=FASTA,
+    output:
+        done=touch("temp/bwa_ref_{SM}")
+    log:
+        "logs/bwa_index_{SM}.log"
+    shell:
+        """
+        bwa index -p temp/ref_{SM} {input.fasta}
+        """
+
+rule bwa_aln:
+    input:
+        bwa_index_done="temp/bwa_ref_{SM}",
+        reads=rules.window_fa.output.fasta
+    output:
+        sam="results/output_{SM}_{W}.sam"
+    shell:
+        """
+        bwa aln -t {ALN_T} temp/ref_{SM} {input.reads} \
+            | bwa samse -n {NUM_DUPS} temp/ref_{SM} - {input.reads} \
+            | gzip > results/output_{SM}_{W}.sam
+        """
+
+rule create_contacts:
+    input:
+        sam=rules.bwa_aln.output.sam
+    output:
+        contacts="results/contacts_{SM}_{W}.gz"
+    log:
+        "logs/create_contacts_{SM}_{W}.log"
+    params:
+        sdir=SDIR,
+    shell:
+        """
+        gzcat {input.sam} | {params.sdir}/scripts/ntn_bam_to_contacts.py - \
+            | gzip > results/contacts_{SM}_{W}.gz
+        """
+
+rule cooler_density:
+    input:
+        contacts=rules.create_contacts.output.contacts,
+        fai=FAI,
+    output:
+        cool="results/{SM}.{W}.{CW}.density.cool",
+    conda:
+        "envs/env.yaml"
+    log:
+        "logs/cooler_density.{SM}.{W}.{CW}.log",
+    threads: 1
+    resources:
+        mem=64,
+    shell:
+        """
+        cooler cload pairs \
+                -c1 1 -p1 2 -c2 4 -p2 5 \
+                --chunksize 50000000000 \
+                {input.fai}:{wildcards.CW} \
+                --zero-based \
+                {input.contacts} {output.cool}
+        """
+
+rule cooler_zoomify_d:
+    input:
+        d=rules.cooler_density.output.cool,
+    output:
+        d="results/{SM}.{W}.{CW}.density.mcool",
+    conda:
+        "envs/env.yaml"
+    threads: 8
+    log:
+        "logs/cooler_density_d.{SM}.{W}.{CW}.log",
+    resources:
+        mem=8,
+    shell:
+        """
+        cooler zoomify {input.d} \
+                -n {threads} \
+             -o {output.d}
         """
