@@ -92,11 +92,14 @@ rule all:
 
 rule cooler:
     input:
+        cool_s=expand("results/{SM}.{W}.{F}.strand.cool", SM=SM, W=W, F=F),
+        cool_i=expand("results/{SM}.{W}.{F}.identity.cool", SM=SM, W=W, F=F),
+        cool_sm=expand("results/{SM}.{W}.{F}.strand.mcool", SM=SM, W=W, F=F),
+        cool_im=expand("results/{SM}.{W}.{F}.identity.mcool", SM=SM, W=W, F=F),
+
+rule cooler_density:
+    input:
         cool_d = expand("results/{SM}.{W}.{CW}.density.mcool", SM=SM, W=W, CW=CW)
-        # cool_s=expand("results/{SM}.{W}.{F}.strand.cool", SM=SM, W=W, F=F),
-        # cool_i=expand("results/{SM}.{W}.{F}.identity.cool", SM=SM, W=W, F=F),
-        # cool_sm=expand("results/{SM}.{W}.{F}.strand.mcool", SM=SM, W=W, F=F),
-        # cool_im=expand("results/{SM}.{W}.{F}.identity.mcool", SM=SM, W=W, F=F),
 
 
 rule make_windows:
@@ -480,7 +483,7 @@ rule create_contacts:
             | gzip > results/contacts_{SM}_{W}.gz
         """
 
-rule cooler_density:
+rule cooler_density_d:
     input:
         contacts=rules.create_contacts.output.contacts,
         fai=FAI,
@@ -505,7 +508,7 @@ rule cooler_density:
 
 rule cooler_zoomify_d:
     input:
-        d=rules.cooler_density.output.cool,
+        d=rules.cooler_density_d.output.cool,
     output:
         d="results/{SM}.{W}.{CW}.density.mcool",
     conda:
