@@ -77,4 +77,13 @@ pip install higlass-manage
 higlass-manage view results/small.5000.10000.strand.mcool
 ```
 
-See the [T2T CHM13 v1.0 StainedGlass](https://resgen.io/paper-data/T2T/views/MtjcVgrlQmymnHIvdck5-g) for an example.
+See the [T2T CHM13 v1.0 StainedGlass](https://resgen.io/paper-data/T2T/views/MtjcVgrlQmymnHIvdck5-g) for an example. 
+
+#### High-res interactive visualization
+
+To create a high-resolution interactive visualization where the
+coloring is proportionally to the number of reads mapped to each bin, use the following command:
+
+```
+./StainedGlass.sh --cores 24 cooler_density -C window=32 cooler_window=100
+```
