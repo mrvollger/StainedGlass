@@ -115,4 +115,3 @@ if __name__ == "__main__":
 
     if args.full is not None:
         out.to_csv(args.full, index=False, sep="\t")
-

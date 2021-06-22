@@ -12,14 +12,15 @@ shell.prefix(f"set -eo pipefail; ")
 
 configfile: "config/config.yaml"
 
+
 #
 # global options
 #
 N = config.pop("nbatch", 1)
-NUM_DUPS=config.pop("num_dups", 100)
+NUM_DUPS = config.pop("num_dups", 100)
 SM = config.pop("sample", "sample")
 W = config.pop("window", 5000)
-CW=config.pop('cooler_window', int(W))
+CW = config.pop("cooler_window", int(W))
 ALN_T = config.pop("alnthreads", 4)
 F = config.pop("mm_f", 10000)
 S = config.pop("mm_s", int(W / 5))
@@ -92,6 +93,7 @@ rule all:
         beds=expand("results/{SM}.{W}.{F}.bed", SM=SM, W=W, F=F),
         fulls=expand("results/{SM}.{W}.{F}.full.tbl", SM=SM, W=W, F=F),
 
+
 rule cooler:
     input:
         cool_s=expand("results/{SM}.{W}.{F}.strand.cool", SM=SM, W=W, F=F),
@@ -99,9 +101,10 @@ rule cooler:
         cool_sm=expand("results/{SM}.{W}.{F}.strand.mcool", SM=SM, W=W, F=F),
         cool_im=expand("results/{SM}.{W}.{F}.identity.mcool", SM=SM, W=W, F=F),
 
+
 rule cooler_density:
     input:
-        cool_d = expand("results/{SM}.{W}.{CW}.density.mcool", SM=SM, W=W, CW=CW)
+        cool_d=expand("results/{SM}.{W}.{CW}.density.mcool", SM=SM, W=W, CW=CW),
 
 
 rule make_windows:
@@ -114,7 +117,7 @@ rule make_windows:
     conda:
         "envs/env.yaml"
     threads: 1
-    resources: 
+    resources:
         mem=1,
     shell:
         """
@@ -224,6 +227,7 @@ rule merge_list:
         mem=8,
     run:
         open(output.alns, "w").write("\n".join(input.aln) + "\n")
+
 
 
 rule merge_aln:
@@ -445,45 +449,62 @@ rule cooler_zoomify_s:
              -o {output.s}
         """
 
+
 rule bwa_index:
     input:
         fasta=FASTA,
     output:
-        done=touch("temp/bwa_ref_{SM}")
+        done=touch("temp/bwa_ref_{SM}"),
+    conda:
+        "envs/env.yaml"
     log:
-        "logs/bwa_index_{SM}.log"
+        "logs/bwa_index_{SM}.log",
+    threads: 1
     shell:
         """
-        bwa index -p temp/ref_{SM} {input.fasta}
+        bwa index -p temp/ref_{wildcards.SM} {input.fasta}
         """
+
 
 rule bwa_aln:
     input:
         bwa_index_done="temp/bwa_ref_{SM}",
-        reads=rules.window_fa.output.fasta
+        reads=rules.window_fa.output.fasta,
     output:
-        sam="results/output_{SM}_{W}.sam"
+        sam="results/output_{SM}_{W}.sam",
+    conda:
+        "envs/env.yaml"
+    log:
+        "logs/bwa_aln_{SM}_{W}.log",
+    params:
+        num_dups=NUM_DUPS,
+    threads: ALN_T
     shell:
         """
-        bwa aln -t {ALN_T} temp/ref_{SM} {input.reads} \
-            | bwa samse -n {NUM_DUPS} temp/ref_{SM} - {input.reads} \
-            | gzip > results/output_{SM}_{W}.sam
+        bwa aln -t {threads} temp/ref_{wildcards.SM} {input.reads} \
+            | bwa samse -n {params.num_dups} temp/ref_{wildcards.SM} - {input.reads} \
+            | gzip > results/output_{wildcards.SM}_{wildcards.W}.sam
         """
+
 
 rule create_contacts:
     input:
-        sam=rules.bwa_aln.output.sam
+        sam=rules.bwa_aln.output.sam,
     output:
-        contacts="results/contacts_{SM}_{W}.gz"
+        contacts="results/contacts_{SM}_{W}.gz",
+    conda:
+        "envs/env.yaml"
     log:
-        "logs/create_contacts_{SM}_{W}.log"
+        "logs/create_contacts_{SM}_{W}.log",
     params:
         sdir=SDIR,
+    threads: 1
     shell:
         """
         gzcat {input.sam} | {params.sdir}/scripts/ntn_bam_to_contacts.py - \
-            | gzip > results/contacts_{SM}_{W}.gz
+            | gzip > results/contacts_{wildcards.SM}_{wildcards.W}.gz
         """
+
 
 rule cooler_density_d:
     input:
@@ -507,6 +528,7 @@ rule cooler_density_d:
                 --zero-based \
                 {input.contacts} {output.cool}
         """
+
 
 rule cooler_zoomify_d:
     input:
