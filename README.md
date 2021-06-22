@@ -2,6 +2,7 @@
 
 [![Actions Status](https://github.com/mrvollger/StainedGlass/workflows/CI/badge.svg)](https://github.com/mrvollger/StainedGlass/actions)
 [![Actions Status](https://github.com/mrvollger/StainedGlass/workflows/Linting/badge.svg)](https://github.com/mrvollger/StainedGlass/actions)
+[![Actions Status](https://github.com/mrvollger/StainedGlass/workflows/black/badge.svg)](https://github.com/mrvollger/StainedGlass/actions)
 
 This is a repository for making colorful dot-plots of genomic sequence.
 ![](images/chr8.png "chr8 cen")
@@ -77,7 +78,7 @@ pip install higlass-manage
 higlass-manage view results/small.5000.10000.strand.mcool
 ```
 
-See the [T2T CHM13 v1.0 StainedGlass](https://resgen.io/paper-data/T2T/views/MtjcVgrlQmymnHIvdck5-g) for an example. 
+See the [T2T CHM13 v1.0 StainedGlass](https://resgen.io/paper-data/T2T/views/MtjcVgrlQmymnHIvdck5-g) for an example.
 
 #### High-res interactive visualization
 
