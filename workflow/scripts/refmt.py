@@ -6,6 +6,11 @@ import sys
 import argparse
 import pandas as pd
 
+# from dask.distributed import Client, progress
+# import dask
+# import dask.dataframe as dd
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="", formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -21,12 +26,15 @@ if __name__ == "__main__":
     parser.add_argument(
         "--ncolors", help="number of color qauntiles", type=int, default=10
     )
+    parser.add_argument("--threads", help="nthreads", type=int, default=10)
     parser.add_argument("--fai", help="fai for the genome", required=True)
     parser.add_argument(
         "-d", help="store args.d as true if -d", action="store_true", default=False
     )
     args = parser.parse_args()
+    # client = Client(n_workers=1, threads_per_worker=args.threads, memory_limit="64GB")
 
+    # df = dd.read_csv(args.infile, sep="\t")
     df = pd.read_csv(args.infile, sep="\t")
     # only keep the alignment with the most matching bases
     df.sort_values(
@@ -115,4 +123,3 @@ if __name__ == "__main__":
 
     if args.full is not None:
         out.to_csv(args.full, index=False, sep="\t")
-

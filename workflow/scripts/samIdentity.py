@@ -133,4 +133,3 @@ samfile = pysam.AlignmentFile(args.samfile, threads=8)
 for read in samfile.fetch(until_eof=True):
     sys.stdout.write(formatRead(read))
 samfile.close()
-
