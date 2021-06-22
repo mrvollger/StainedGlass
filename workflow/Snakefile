@@ -229,7 +229,6 @@ rule merge_list:
         open(output.alns, "w").write("\n".join(input.aln) + "\n")
 
 
-
 rule merge_aln:
     input:
         alns=rules.merge_list.output.alns,
@@ -471,7 +470,7 @@ rule bwa_aln:
         bwa_index_done="temp/bwa_ref_{SM}",
         reads=rules.window_fa.output.fasta,
     output:
-        sam="results/output_{SM}_{W}.sam",
+        sam="results/output_{SM}_{W}.sam.gz",
     conda:
         "envs/env.yaml"
     log:
@@ -483,7 +482,7 @@ rule bwa_aln:
         """
         bwa aln -t {threads} temp/ref_{wildcards.SM} {input.reads} \
             | bwa samse -n {params.num_dups} temp/ref_{wildcards.SM} - {input.reads} \
-            | gzip > results/output_{wildcards.SM}_{wildcards.W}.sam
+            | gzip > {output.sam}
         """
 
 
@@ -501,8 +500,8 @@ rule create_contacts:
     threads: 1
     shell:
         """
-        gzcat {input.sam} | {params.sdir}/scripts/ntn_bam_to_contacts.py - \
-            | gzip > results/contacts_{wildcards.SM}_{wildcards.W}.gz
+        gunzip -c {input.sam} | {params.sdir}/scripts/ntn_bam_to_contacts.py - \
+            | gzip > {output.contacts}
         """
 
 
