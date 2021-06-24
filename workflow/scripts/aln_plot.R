@@ -48,12 +48,19 @@ read_bedpe <- function(all.files){
 # get the lowest 0.1% of the data so we can not plot it
 make_hist = function(sdf){
   bot = quantile(sdf$perID_by_events, probs=0.001)[[1]]
+  count = nrow(sdf)
+  extra = ""
+  my_scale = comma
+  if(count > 1e4){
+    extra = "\n(thousands)"
+    my_scale = make_k
+  }
   p = ggplot(data=sdf, aes(perID_by_events, fill = discrete)) + geom_histogram( bins = 300) +
     theme_cowplot() + 
     scale_fill_brewer(palette = "Spectral", direction = -1) + theme(legend.position = "none") + 
-    scale_y_continuous(labels=make_k) +
+    scale_y_continuous(labels=my_scale) +
     coord_cartesian(xlim = c(bot, 100))+
-    xlab("% identity")+ylab("# of alignments (thousands)")
+    xlab("% identity")+ylab(glue("# of alignments{extra}"))
   p
 }
 
@@ -146,11 +153,28 @@ make_plots <- function(r_name) {
   dir.create(glue("{OUT}/pngs/{r_name}/"))
   
   # save the plots
-  plot = cowplot::plot_grid(
-    p_lone, p_hist,
-    ncol=1, 
-    rel_heights = c(3*scale,1)
-  )
+  if(TRI){
+    build = ggplot_build(p_lone)
+    yr = build$layout$panel_params[[1]]$y.range
+    xr = build$layout$panel_params[[1]]$x.range
+    #print("built")
+    #print(xlim)
+    plot = p_lone + annotation_custom(
+      ggplotGrob(p_hist +
+        theme(text = element_text(size=10),
+              axis.text=element_text(size=10)
+        )
+      ), 
+      xmin = xr[1], xmax = (xr[2]-xr[1])/2,
+      ymin = (yr[2]-yr[1])*1/2, ymax = yr[2]
+      )
+  } else {
+    plot = cowplot::plot_grid(
+      p_lone, p_hist,
+      ncol=1, 
+      rel_heights = c(3*scale,1)
+    )
+  }
   ggsave(plot=plot,
          file=glue("{OUT}/pdfs/{r_name}/{PRE}__{r_name}__tri.{TRI}__onecolorscale.{ONECOLORSCALE}.pdf"),
          height = 12*scale, width = 9)
@@ -158,8 +182,11 @@ make_plots <- function(r_name) {
   ggsave(plot=plot,
          file = glue("{OUT}/pngs/{r_name}/{PRE}__{r_name}__tri.{TRI}__onecolorscale.{ONECOLORSCALE}.png"), 
          height = 12*scale, width = 10, dpi = DPI)
-  
-  p_lone
+  if(TRI){
+    return(plot)
+  }else{
+    return(p_lone)
+  }
 }
 ########################################################################################################
 #
@@ -210,7 +237,12 @@ for(TRI in vals){
   }
   for(ONECOLORSCALE in vals){
       plots = lapply(Qs, make_plots)
-      plots[[N+1]] = make_hist(df) 
+      if(!TRI){
+        plots[[N+1]] = make_hist(df) 
+      }
+      N=length(plots)
+      columns = ceiling(sqrt(N))
+      rows = ceiling( (N) / columns)
       p = cowplot::plot_grid(plotlist = plots, nrow=rows, ncol=columns, labels = "auto");
       ggsave(glue("{OUT}/pdfs/{PRE}.tri.{TRI}__onecolorscale.{ONECOLORSCALE}__all.pdf"), plot=p, height = 6*rows*scale, width = 6*columns)
       ggsave(glue("{OUT}/pngs/{PRE}.tri.{TRI}__onecolorscale.{ONECOLORSCALE}__all.png"), plot=p, height = 6*rows*scale, width = 6*columns, dpi=DPI)
