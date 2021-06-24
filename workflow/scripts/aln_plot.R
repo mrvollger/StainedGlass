@@ -53,7 +53,7 @@ make_hist = function(sdf){
   count = nrow(sdf)
   extra = ""
   my_scale = comma
-  if(count > 1e4){
+  if(count > 1e5){
     extra = "\n(thousands)"
     my_scale = make_k
   }

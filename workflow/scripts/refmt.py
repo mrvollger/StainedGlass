@@ -119,7 +119,9 @@ if __name__ == "__main__":
     to_out = out[keep_cols]
     out_header = keep_cols
     out_header[0] = "#" + out_header[0]
-    to_out.to_csv(args.outfile, index=False, header=out_header, sep="\t")
+    to_out.to_csv(
+        args.outfile, index=False, header=out_header, sep="\t", compression="gzip"
+    )
 
     if args.full is not None:
-        out.to_csv(args.full, index=False, sep="\t")
+        out.to_csv(args.full, index=False, sep="\t", compression="gzip")

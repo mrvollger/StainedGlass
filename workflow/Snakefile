@@ -87,8 +87,8 @@ wildcard_constraints:
 rule all:
     input:
         sort=expand("results/{SM}.{W}.{F}.sorted.bam", SM=SM, W=W, F=F),
-        beds=expand("results/{SM}.{W}.{F}.bed", SM=SM, W=W, F=F),
-        fulls=expand("results/{SM}.{W}.{F}.full.tbl", SM=SM, W=W, F=F),
+        beds=expand("results/{SM}.{W}.{F}.bed.gz", SM=SM, W=W, F=F),
+        fulls=expand("results/{SM}.{W}.{F}.full.tbl.gz", SM=SM, W=W, F=F),
 
 
 rule cooler:
@@ -271,7 +271,7 @@ rule identity:
     input:
         aln=rules.sort_aln.output.aln,
     output:
-        tbl=temp("results/{SM}.{W}.{F}.tbl"),
+        tbl=temp("temp/{SM}.{W}.{F}.tbl.gz"),
     conda:
         "envs/env.yaml"
     threads: 8
@@ -285,8 +285,10 @@ rule identity:
     threads: 8
     shell:
         """
-        {params.sdir}/scripts/samIdentity.py --threads {threads} --matches {params.S} --header \
-          {input.aln} > {output.tbl}
+        {params.sdir}/scripts/samIdentity.py --threads {threads} \
+            --matches  {params.S} --header \
+            {input.aln} \
+            | pigz -p {threads} > {output.tbl}
         """
 
 
@@ -295,8 +297,8 @@ rule pair_end_bed:
         tbl=rules.identity.output.tbl,
         fai=FAI,
     output:
-        bed="results/{SM}.{W}.{F}.bed",
-        full="results/{SM}.{W}.{F}.full.tbl",
+        bed="results/{SM}.{W}.{F}.bed.gz",
+        full="results/{SM}.{W}.{F}.full.tbl.gz",
     conda:
         "envs/env.yaml"
     threads: 1
@@ -365,7 +367,7 @@ rule cooler_strand:
         mem=64,
     shell:
         """
-        cat {input.bed} | tail -n +2 \
+        gunzip -c {input.bed} | tail -n +2 \
             | sed  's/+$/100/g' \
             | sed  's/-$/50/g' \
               | cooler cload pairs \
@@ -396,7 +398,7 @@ rule cooler_identity:
         mem=64,
     shell:
         """
-        cat {input.bed} | tail -n +2 \
+        gunzip -c {input.bed} | tail -n +2 \
               | cooler cload pairs \
                 -c1 1 -p1 2 -c2 4 -p2 5 \
                         --field count=7:agg=mean,dtype=float \
