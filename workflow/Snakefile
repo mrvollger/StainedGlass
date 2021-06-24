@@ -25,7 +25,7 @@ ALN_T = config.pop("alnthreads", 4)
 F = config.pop("mm_f", 10000)
 S = config.pop("mm_s", int(W / 5))
 TEMP_DIR = config.pop("tempdir", "temp")
-
+SAMTOOLS_MEM = config.pop("samtools_mem", 4)
 
 if TEMP_DIR != "temp":
     if os.path.exists("temp"):
@@ -208,7 +208,7 @@ rule aln:
             -ax ava-ont --dual=yes --eqx \
             {input.split_ref} \
             <( bedtools getfasta -fi {input.ref} -bed {input.bed} ) \
-            | samtools sort -m 4G \
+            | samtools sort -m {resources.mem}G \
             -o {output.aln}
         """
 
@@ -260,7 +260,7 @@ rule sort_aln:
         "logs/sort_aln.{SM}.{W}.{F}.log",
     threads: 8
     resources:
-        mem=8,
+        mem=SAMTOOLS_MEM,
     shell:
         """
         samtools sort -m {resources.mem}G -@ {threads} --write-index \
