@@ -26,9 +26,7 @@ TEMP_DIR = config.pop("tempdir", "temp")
 
 if TEMP_DIR != "temp":
     if os.path.exists("temp"):
-        if os.path.islink("temp") and os.path.realpath("temp") == os.path.realpath(
-            TEMP_DIR
-        ):
+        if os.path.realpath("temp") == os.path.realpath(TEMP_DIR):
             print("The temp dir has already been linked.")
         else:
             sys.exit("temp/ already in use, please move it before running.")
@@ -255,14 +253,14 @@ rule sort_aln:
         mem=8,
     shell:
         """
-        samtools sort -m 4G -@ {threads} \
+        samtools sort -m {resources.mem}G -@ {threads} --write-index \
             -o {output.aln} {input.aln}
         """
 
 
 rule identity:
     input:
-        aln=rules.merge_aln.output.aln,
+        aln=rules.sort_aln.output.aln,
     output:
         tbl=temp("results/{SM}.{W}.{F}.tbl"),
     conda:
@@ -275,9 +273,10 @@ rule identity:
         "logs/identity.{SM}.{W}.{F}.log",
     resources:
         mem=8,
+    threads: 8
     shell:
         """
-        {params.sdir}/scripts/samIdentity.py --matches {params.S} --header \
+        {params.sdir}/scripts/samIdentity.py --threads {threads} --matches {params.S} --header \
           {input.aln} > {output.tbl}
         """
 

@@ -8,6 +8,9 @@ parser.add_argument("-d", action="store_true", default=False)
 parser.add_argument(
     "-m", "--matches", help="min num of matches to return", type=int, default=0
 )
+parser.add_argument(
+    "-t", "--threads", help="threads", type=int, default=8
+)
 parser.add_argument("--header", action="store_true", default=False)
 args = parser.parse_args()
 DEBUG = args.d
@@ -129,7 +132,7 @@ def formatRead(read):
 
 if args.header:
     print(makeHeader())
-samfile = pysam.AlignmentFile(args.samfile, threads=8)
+samfile = pysam.AlignmentFile(args.samfile, threads=args.threads)
 for read in samfile.fetch(until_eof=True):
     sys.stdout.write(formatRead(read))
 samfile.close()
