@@ -1,3 +1,7 @@
+%% 2017/04/15: Updated by Overleaf to truncate 
+%% authors list to only First Author et al. when
+%% there are more than 2 authors.
+%%
 %% 
 %% This is file `natbib.bst', generated 
 %% on <1994/9/16> with the docstrip utility (2.2h).
@@ -239,12 +243,21 @@ FUNCTION {format.names}
     { s nameptr
       "{vv~}{ll}{, jj}{, f.}" format.name$ 't :=
       nameptr #1 >
-        {
+         {
+          nameptr #1
+          #1 + =
+          numnames #2
+          > and
+            { "others" 't :=
+              #1 'namesleft := }
+            'skip$
+          if$
           namesleft #1 >
-            { ", " * t * }
+          { ", " * t * }
             {
               numnames #2 >
-                { "," * }
+                % { "," * }
+                { " " * }
                 'skip$
               if$
               t "others" =

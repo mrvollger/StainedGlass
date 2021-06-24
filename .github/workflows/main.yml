@@ -24,4 +24,4 @@ jobs:
       with:
         directory: .
         snakefile: workflow/Snakefile
-        args: "--use-conda -j 3 --conda-cleanup-pkgs cache --conda-frontend mamba -p make_figures cooler"
+        args: "--use-conda -j 3 --conda-cleanup-pkgs cache --conda-frontend mamba -p make_figures cooler cooler_density"

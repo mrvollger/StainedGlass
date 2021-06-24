@@ -44,3 +44,19 @@ Path for a temp dir to be used by pipeline.
 ```
 tempdir: temp
 ```
+
+### Configuration options for high-res dot plots (cooler_density)
+
+This defines the smallest bin size (highest resolution) used in the cooler file.
+
+```
+cooler_window: 100
+```
+
+Since `window` defines the read length, it should be made to be smaller than `cooler_window`. I like to use `window: 32` and `cooler_window: 100`.
+
+This is the maximum number of alignments to output for each read. From the `bwa` help page: Maximum number of alignments to output in the XA tag for reads paired properly. If a read has more than INT hits, the XA tag will not be written.
+
+```
+num_dups: 100
+```
