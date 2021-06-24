@@ -86,7 +86,6 @@ wildcard_constraints:
 
 rule all:
     input:
-        alns=expand("results/{SM}.{W}.{F}.bam", SM=SM, W=W, F=F),
         sort=expand("results/{SM}.{W}.{F}.sorted.bam", SM=SM, W=W, F=F),
         beds=expand("results/{SM}.{W}.{F}.bed", SM=SM, W=W, F=F),
         fulls=expand("results/{SM}.{W}.{F}.full.tbl", SM=SM, W=W, F=F),
@@ -233,7 +232,7 @@ rule merge_aln:
         aln=expand("temp/{SM}.{W}.{F}.{ID}.bam", ID=IDS, allow_missing=True),
         split_ref=rules.window_fa.output.fasta,
     output:
-        aln=temp("results/{SM}.{W}.{F}.bam"),
+        aln=temp("temp/{SM}.{W}.{F}.bam"),
     conda:
         "envs/env.yaml"
     log:
@@ -323,11 +322,11 @@ rule make_R_figures:
     input:
         bed=rules.pair_end_bed.output.bed,
     output:
-        pdf="results/{SM}.{W}.{F}_figures/pdfs/{SM}.{W}.{F}.facet.all.pdf",
-        png="results/{SM}.{W}.{F}_figures/pngs/{SM}.{W}.{F}.facet.all.png",
+        pdf="results/{SM}.{W}.{F}_figures/pdfs/{SM}.{W}.{F}.tri.TRUE__onecolorscale.FALSE__all.pdf",
+        png="results/{SM}.{W}.{F}_figures/pngs/{SM}.{W}.{F}.tri.TRUE__onecolorscale.FALSE__all.png",
     conda:
         "envs/R.yaml"
-    threads: 1
+    threads: 8
     log:
         "logs/make_R_figures.{SM}.{W}.{F}.log",
     params:
@@ -338,6 +337,7 @@ rule make_R_figures:
         """
         Rscript {params.sdir}/scripts/aln_plot.R \
             --bed {input.bed} \
+            --threads {threads} \
             --prefix {wildcards.SM}.{wildcards.W}.{wildcards.F}
         """
 

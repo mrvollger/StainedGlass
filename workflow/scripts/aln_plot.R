@@ -6,7 +6,9 @@ library(RColorBrewer)
 library(data.table)
 library(cowplot)
 library(glue)
+library(parallel)
 require("argparse")
+
 #setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 ncolors  = 11 # max value is 11
@@ -131,6 +133,13 @@ make_dot = function(sdf, rname=""){
 
 
 make_plots <- function(r_name) {
+  library(ggplot2)
+  library(dplyr)
+  require(scales)
+  library(RColorBrewer)
+  library(data.table)
+  library(cowplot)
+  library(glue)
   sdf = copy(df[r == r_name & q == r_name])
   # set the colors
   if(!ONECOLORSCALE){
@@ -194,6 +203,7 @@ make_plots <- function(r_name) {
 #
 parser <- ArgumentParser()
 parser$add_argument("-b", "--bed",  help="bedfile with alignment information")
+parser$add_argument("-t", "--threads", type = "integer", help="number of threads")
 parser$add_argument("-p", "--prefix",  help="Prefix for the outputs")
 args <- parser$parse_args()
 
@@ -223,7 +233,7 @@ rows = ceiling( (N+1) / columns)
 #
 # big plot
 #
-if(T){
+if(F){
   facet_fig = cowplot::plot_grid(make_hist(df), make_dot(df), rel_heights = c(1,4), ncol=1)
   ggsave(plot=facet_fig, file=glue("{OUT}/pdfs/{PRE}.facet.all.pdf"), height = 20, width = 16)
   ggsave(plot=facet_fig, file=glue("{OUT}/pngs/{PRE}.facet.all.png"), height = 20, width = 16, dpi=DPI)
@@ -236,7 +246,23 @@ for(TRI in vals){
     scale = 1
   }
   for(ONECOLORSCALE in vals){
-      plots = lapply(Qs, make_plots)
+      #plots = lapply(Qs, make_plots)
+      cl <- parallel::makeCluster(args$threads, setup_strategy = "sequential")
+      clusterExport(cl=cl, 
+                    varlist=c("TRI", "OUT", "df", 
+                              "scale", "PRE", "DPI",
+                              "ONECOLORSCALE", "ncolors",
+                              "make_scale",
+                              "make_k",
+                              "get_colors",
+                              "read_bedpe",
+                              "make_hist",
+                              "diamond",
+                              "make_tri",
+                              "make_dot")
+                    )
+      plots = parLapply(cl=cl, Qs, make_plots) 
+      stopCluster(cl)
       if(!TRI){
         plots[[N+1]] = make_hist(df) 
       }
