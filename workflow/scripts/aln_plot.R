@@ -83,24 +83,20 @@ diamond <- function( row ){
 }
 
 make_tri = function(sdf, rname=""){
-  #sdf = read_bedpe("~/Desktop/repos/StainedGlass/results/chr8.2000.10000.bed")[`#query_name` == "chr8" & reference_name == "chr8"]
   sdf$w = (sdf$first_pos  + sdf$second_pos) 
   sdf$z = -sdf$first_pos + sdf$second_pos
   window = max(sdf$q_en - sdf$q_st)
-  scale =  max(sdf$q_st)/max(sdf$w) 
-  sdf$window = max(sdf$q_en - sdf$q_st)/scale
+  tri_scale =  max(sdf$q_st)/max(sdf$w) 
+  sdf$window = max(sdf$q_en - sdf$q_st)/tri_scale
   sdf$group = seq(nrow(sdf))
   df.d = rbindlist(apply(sdf, 1, diamond ))
-  #df.d %>% summarise(max(w-z))
-  #ggplot(sdf) +
-    #geom_tile(aes(x = w*scale, y = z*window , fill = discrete)) + 
+  
   ggplot(df.d)+
-    geom_polygon(aes(x = w*scale, y = z*window , group=group, fill = factor(discrete))) + 
+    geom_polygon(aes(x = w*tri_scale, y = z*window , group=group, fill = factor(discrete))) + 
     theme_cowplot() + 
     scale_fill_brewer(palette = "Spectral", direction = -1) + 
-    scale_x_continuous(labels=make_scale) +
-    scale_y_continuous(labels=make_scale, limits = c(0,NA)) +
-    #coord_fixed(ratio = 1) +
+    scale_x_continuous(labels=make_scale, limits = c(0, NA)) +
+    scale_y_continuous(labels=make_scale, limits = c(0, NA)) +
     xlab("Genomic position (Mbp)") + ylab("") +
     theme(legend.position = "none", 
           axis.text.y = element_blank(),
@@ -108,12 +104,6 @@ make_tri = function(sdf, rname=""){
           axis.line.y = element_blank()) + 
     ggtitle(rname)
 }
-#sdf
-#rbindlist(apply(head(sdf), 1, diamond ))
-#t = df[r==df$r[1] & q_en < 1e6 & r_en < 1e6]
-#t = df[r == df$r[1]]
-#make_tri(t, rname="a")
-#make_dot(t, rname="a")
 
 make_dot = function(sdf, rname=""){
   max = max(sdf$q_en, sdf$r_en)
@@ -163,20 +153,24 @@ make_plots <- function(r_name) {
   
   # save the plots
   if(TRI){
+    p_hist = p_hist + 
+        theme(text = element_text(size=10), axis.text=element_text(size=10))
+    
+    # ranges for inset hist
+    mmax = max(sdf$q_en, sdf$r_en)
     build = ggplot_build(p_lone)
     yr = build$layout$panel_params[[1]]$y.range
-    xr = build$layout$panel_params[[1]]$x.range
-    #print("built")
-    #print(xlim)
+    xmin = 0
+    xmax = mmax * 1/3
+    ymin = yr[2] * 1/2 ;
+    ymax = yr[2] * 2/2 ;
+    print(paste(r_name, xmin, xmax, ymin, ymax))
+    # combine
     plot = p_lone + annotation_custom(
-      ggplotGrob(p_hist +
-        theme(text = element_text(size=10),
-              axis.text=element_text(size=10)
-        )
-      ), 
-      xmin = xr[1], xmax = (xr[2]-xr[1])/3,
-      ymin = (yr[2]-yr[1])*1/2, ymax = yr[2]
-      )
+                      ggplotGrob(p_hist),
+                      xmin = xmin, xmax = xmax, 
+                      ymin = ymin, ymax = ymax
+                      )
   } else {
     plot = cowplot::plot_grid(
       p_lone, p_hist,
@@ -223,21 +217,14 @@ dir.create(OUT)
 dir.create(glue("{OUT}/pdfs"))
 dir.create(glue("{OUT}/pngs"))
 all.files = Sys.glob(GLOB)
-df = read_bedpe(all.files)
+df = read_bedpe(all.files)#[1:5e4]
 #df=fread(GLOB)
 Qs = unique(df$q)
 N=length(Qs)
 columns = ceiling(sqrt(N+1))
 rows = ceiling( (N+1) / columns)
 
-#
-# big plot
-#
-if(F){
-  facet_fig = cowplot::plot_grid(make_hist(df), make_dot(df), rel_heights = c(1,4), ncol=1)
-  ggsave(plot=facet_fig, file=glue("{OUT}/pdfs/{PRE}.facet.all.pdf"), height = 20, width = 16)
-  ggsave(plot=facet_fig, file=glue("{OUT}/pngs/{PRE}.facet.all.png"), height = 20, width = 16, dpi=DPI)
-}
+
 vals = c(TRUE, FALSE)
 for(TRI in vals){
   if(TRI){
@@ -247,10 +234,12 @@ for(TRI in vals){
   }
   for(ONECOLORSCALE in vals){
       #plots = lapply(Qs, make_plots)
-      cl <- parallel::makeCluster(args$threads, setup_strategy = "sequential")
+      cl <- parallel::makeCluster(min(args$threads, length(Qs)), 
+                                  setup_strategy = "sequential",
+                                  outfile="")
       clusterExport(cl=cl, 
                     varlist=c("TRI", "OUT", "df", 
-                              "scale", "PRE", "DPI",
+                              "PRE", "DPI",
                               "ONECOLORSCALE", "ncolors",
                               "make_scale",
                               "make_k",
@@ -273,4 +262,13 @@ for(TRI in vals){
       ggsave(glue("{OUT}/pdfs/{PRE}.tri.{TRI}__onecolorscale.{ONECOLORSCALE}__all.pdf"), plot=p, height = 6*rows*scale, width = 6*columns)
       ggsave(glue("{OUT}/pngs/{PRE}.tri.{TRI}__onecolorscale.{ONECOLORSCALE}__all.png"), plot=p, height = 6*rows*scale, width = 6*columns, dpi=DPI)
   }
+}
+
+#
+# big plot
+#
+if(T){
+  facet_fig = cowplot::plot_grid(make_hist(df), make_dot(df), rel_heights = c(1,4), ncol=1)
+  ggsave(plot=facet_fig, file=glue("{OUT}/pdfs/{PRE}.facet.all.pdf"), height = 20, width = 16)
+  ggsave(plot=facet_fig, file=glue("{OUT}/pngs/{PRE}.facet.all.png"), height = 20, width = 16, dpi=DPI)
 }
