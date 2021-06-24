@@ -162,8 +162,8 @@ make_plots <- function(r_name) {
     yr = build$layout$panel_params[[1]]$y.range
     xmin = 0
     xmax = mmax * 1/3
-    ymin = yr[2] * 1/2 ;
-    ymax = yr[2] * 2/2 ;
+    ymin = yr[2] * 1/2
+    ymax = yr[2] * 2/2
     print(paste(r_name, xmin, xmax, ymin, ymax))
     # combine
     plot = p_lone + annotation_custom(
