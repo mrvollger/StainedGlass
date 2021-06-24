@@ -174,7 +174,7 @@ make_plots <- function(r_name) {
               axis.text=element_text(size=10)
         )
       ), 
-      xmin = xr[1], xmax = (xr[2]-xr[1])/2,
+      xmin = xr[1], xmax = (xr[2]-xr[1])/3,
       ymin = (yr[2]-yr[1])*1/2, ymax = yr[2]
       )
   } else {
@@ -274,11 +274,3 @@ for(TRI in vals){
       ggsave(glue("{OUT}/pngs/{PRE}.tri.{TRI}__onecolorscale.{ONECOLORSCALE}__all.png"), plot=p, height = 6*rows*scale, width = 6*columns, dpi=DPI)
   }
 }
-
-if(F){
-  ONECOLORSCALE=FALSE
-  TRI=TRUE
-  z = make_plots(Qs[1])
-  z
-}
-
