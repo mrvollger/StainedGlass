@@ -1,7 +1,7 @@
 sample: small
 fasta: .test/small.fasta
-window: 5000 
-nbatch: 100 
+window: 1000 
+nbatch: 4 
 alnthreads: 4 
 mm_f: 10000 
 tempdir: temp 
