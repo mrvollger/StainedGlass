@@ -91,3 +91,8 @@ coloring is proportionally to the number of reads mapped to each bin, use the fo
 ```
 snakemake --use-conda --cores 24 cooler_density --config window=32 cooler_window=100
 ```
+
+## TODO
+
+- Allow users to adjust the color pallet used in R
+- Test short read aligners with smaller window sizes
