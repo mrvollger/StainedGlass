@@ -186,7 +186,7 @@ rule aln_prep:
         """
         minimap2 \
             -f {wildcards.F} -s {params.S} \
-            {MAP_PARAMS} \
+            {params.MAP_PARAMS} \
              -d {output.split_ref_index} \
             {input.split_ref} 
         """
@@ -214,7 +214,7 @@ rule aln:
         minimap2 \
             -t {threads} \
             -f {wildcards.F} -s {params.S} \
-            {MAP_PARAMS} \
+            {params.MAP_PARAMS} \
             --dual=yes --eqx \
             {input.split_ref} \
             <( bedtools getfasta -fi {input.ref} -bed {input.bed} ) \
