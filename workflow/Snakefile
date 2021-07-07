@@ -27,6 +27,12 @@ S = config.pop("mm_s", int(W / 5))
 TEMP_DIR = config.pop("tempdir", "temp")
 SAMTOOLS_MEM = config.pop("samtools_mem", 1)
 
+# short vs long read mapping
+MAP_PARAMS = "-ax ava-ont "
+if W < 500:
+    MAP_PARAMS = " -a --no-pairing -k21 --sr -A2 -B8 -O12,32 -E2,1 -r100 -g100 -2K50m --heap-sort=yes -Xw5 -e0 "
+
+
 if TEMP_DIR != "temp":
     if os.path.exists("temp"):
         if os.path.realpath("temp") == os.path.realpath(TEMP_DIR):
@@ -173,12 +179,14 @@ rule aln_prep:
     threads: 1
     params:
         S=S,
+        MAP_PARAMS=MAP_PARAMS,
     resources:
         mem=4,
     shell:
         """
         minimap2 \
-            -f {wildcards.F} -s {params.S} -x ava-ont \
+            -f {wildcards.F} -s {params.S} \
+            {MAP_PARAMS} \
              -d {output.split_ref_index} \
             {input.split_ref} 
         """
@@ -198,13 +206,16 @@ rule aln:
     threads: ALN_T
     params:
         S=S,
+        MAP_PARAMS=MAP_PARAMS,
     resources:
         mem=4,
     shell:
         """
         minimap2 \
-            -t {threads} -f {wildcards.F} -s {params.S} \
-            -ax ava-ont --dual=yes --eqx \
+            -t {threads} \
+            -f {wildcards.F} -s {params.S} \
+            {MAP_PARAMS} \
+            --dual=yes --eqx \
             {input.split_ref} \
             <( bedtools getfasta -fi {input.ref} -bed {input.bed} ) \
             | samtools sort -m {resources.mem}G \
