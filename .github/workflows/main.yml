@@ -17,10 +17,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Test workflow
+    - name: Test workflow on large windows
       uses: snakemake/snakemake-github-action@v1.19.0
       with:
         directory: .
         snakefile: workflow/Snakefile
         args: "--use-conda -j 3 --conda-cleanup-pkgs cache --conda-frontend mamba -p make_figures cooler cooler_density"
+  small_windows:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: small windows
+      uses: snakemake/snakemake-github-action@v1.19.0
+      with:
+        directory: .
+        snakefile: workflow/Snakefile
+        args: "--use-conda -j 3 --conda-cleanup-pkgs cache --conda-frontend mamba --config window=400 -p make_figures cooler cooler_density"
   
