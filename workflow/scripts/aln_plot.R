@@ -25,6 +25,10 @@ get_colors = function(sdf){
   bot = floor(min(sdf$perID_by_events)); top = 100
   breaks = unique( c(quantile(sdf$perID_by_events, probs = seq(0, 1, by = 1/ncolors))) )
   labels = seq(length(breaks)-1)
+  # corner case of only one %id value
+  if( length(breaks) == 1){
+    return(factor(rep(1, length(sdf$perID_by_events))))
+  }
   return( cut(sdf$perID_by_events, breaks=breaks, labels = labels, include.lowest=TRUE)  )
 }
 
@@ -49,6 +53,8 @@ read_bedpe <- function(all.files){
 
 # get the lowest 0.1% of the data so we can not plot it
 make_hist = function(sdf){
+  scale_x_fun <- function(x) sprintf("%.1f", x)
+
   bot = quantile(sdf$perID_by_events, probs=0.001)[[1]]
   count = nrow(sdf)
   extra = ""
@@ -61,6 +67,7 @@ make_hist = function(sdf){
     theme_cowplot() + 
     scale_fill_brewer(palette = "Spectral", direction = -1) + theme(legend.position = "none") + 
     scale_y_continuous(labels=my_scale) +
+    scale_x_continuous(labels=scale_x_fun) +
     coord_cartesian(xlim = c(bot, 100))+
     xlab("% identity")+ylab(glue("# of alignments{extra}"))
   p
@@ -139,7 +146,7 @@ make_plots <- function(r_name) {
   # make the plots
   if(TRI){
     p_lone = make_tri(sdf, rname=r_name)
-    scale = 2/3
+    scale = 1/2.25
   }else{
     scale = 1
     p_lone = make_dot(sdf, rname=r_name)
@@ -154,14 +161,14 @@ make_plots <- function(r_name) {
   # save the plots
   if(TRI){
     p_hist = p_hist + 
-        theme(text = element_text(size=10), axis.text=element_text(size=10))
+        theme(text = element_text(size=8), axis.text=element_text(size=8))
     
     # ranges for inset hist
     mmax = max(sdf$q_en, sdf$r_en)
     build = ggplot_build(p_lone)
     yr = build$layout$panel_params[[1]]$y.range
-    xmin = 0
-    xmax = mmax * 1/3
+    xmin = - 1/10 * mmax
+    xmax = mmax * 1/3.75
     ymin = yr[2] * 1/2
     ymax = yr[2] * 2/2
     print(paste(r_name, xmin, xmax, ymin, ymax))
@@ -178,13 +185,21 @@ make_plots <- function(r_name) {
       rel_heights = c(3*scale,1)
     )
   }
-  ggsave(plot=plot,
-         file=glue("{OUT}/pdfs/{r_name}/{PRE}__{r_name}__tri.{TRI}__onecolorscale.{ONECOLORSCALE}.pdf"),
-         height = 12*scale, width = 9)
-  
-  ggsave(plot=plot,
-         file = glue("{OUT}/pngs/{r_name}/{PRE}__{r_name}__tri.{TRI}__onecolorscale.{ONECOLORSCALE}.png"), 
-         height = 12*scale, width = 10, dpi = DPI)
+  # if we are not making a facet only save the pdf
+  if(!ONECOLORSCALE){
+    ggsave(plot=plot,
+          file=glue("{OUT}/pdfs/{r_name}/{PRE}__{r_name}__tri.{TRI}.pdf"),
+          height=12*scale,
+          width = 9
+          )
+    
+    ggsave(plot=plot,
+          file=glue("{OUT}/pngs/{r_name}/{PRE}__{r_name}__tri.{TRI}.png"), 
+          height=12*scale,
+          width = 9,
+          dpi = DPI
+          )
+  }
   if(TRI){
     return(plot)
   }else{
