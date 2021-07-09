@@ -16,23 +16,10 @@ jobs:
   Ubuntu:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Checkout submodules
-      uses: textbook/git-checkout-submodule-action@2.0.0
     - name: Test workflow
-      uses: snakemake/snakemake-github-action@v1.18.0
-      with:
-        directory: .
-        snakefile: workflow/Snakefile
-        args: "--use-conda -j 3 --conda-cleanup-pkgs cache --conda-frontend mamba -p make_figures cooler cooler_density"
-  
-  MacOS:
-    runs-on: macos-latest
-    steps:
-    - name: Test macos latest
       uses: snakemake/snakemake-github-action@v1.19.0
       with:
         directory: .
         snakefile: workflow/Snakefile
         args: "--use-conda -j 3 --conda-cleanup-pkgs cache --conda-frontend mamba -p make_figures cooler cooler_density"
-
+  
