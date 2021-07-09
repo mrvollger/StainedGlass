@@ -16,6 +16,9 @@ jobs:
   Ubuntu:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
+    - name: Checkout submodules
+      uses: textbook/git-checkout-submodule-action@2.0.0
     - name: Test workflow
       uses: snakemake/snakemake-github-action@v1.19.0
       with:
