@@ -29,9 +29,8 @@ jobs:
   MacOS:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
     - name: Test macos latest
-      uses: snakemake/snakemake-github-action@v1.18.0
+      uses: snakemake/snakemake-github-action@v1.19.0
       with:
         directory: .
         snakefile: workflow/Snakefile
