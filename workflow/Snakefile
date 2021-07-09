@@ -30,7 +30,7 @@ SAMTOOLS_MEM = config.pop("samtools_mem", 1)
 # short vs long read mapping
 MAP_PARAMS = "-ax ava-ont "
 if W < 500:
-    MAP_PARAMS = " -a --no-pairing -k21 --sr -A2 -B8 -O12,32 -E2,1 -r100 -g100 -2K50m --heap-sort=yes -Xw5 -e0 "
+    MAP_PARAMS = " -a --no-pairing -k21 --sr -A2 -B8 -O12,32 -E2,1 -r100 -g100 -2K50m --heap-sort=yes -X -w 5 -e0 "
 
 
 if TEMP_DIR != "temp":
