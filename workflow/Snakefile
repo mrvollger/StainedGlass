@@ -319,11 +319,13 @@ rule pair_end_bed:
         mem=64,
     params:
         sdir=SDIR,
+        one="--one" if "one" in config else "",
     shell:
         """
         {params.sdir}/scripts/refmt.py \
             --window {wildcards.W} --fai {input.fai} \
             --full {output.full} \
+            {params.one} \
             {input.tbl} {output.bed}
         """
 

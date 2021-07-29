@@ -31,16 +31,26 @@ if __name__ == "__main__":
     parser.add_argument(
         "-d", help="store args.d as true if -d", action="store_true", default=False
     )
+    parser.add_argument(
+        "--one",
+        help="filter for best 1-1 alignment",
+        action="store_true",
+        default=False,
+    )
     args = parser.parse_args()
     # client = Client(n_workers=1, threads_per_worker=args.threads, memory_limit="64GB")
 
     # df = dd.read_csv(args.infile, sep="\t")
     df = pd.read_csv(args.infile, sep="\t")
+
+    # determine duplicates by these columns
+    det_dup_cols = ["query_name", "reference_name"]
+    if args.one:
+        det_dup_cols = ["reference_name"]
     # only keep the alignment with the most matching bases
-    df.sort_values(
-        by=["query_name", "reference_name", "matches"], inplace=True, ascending=False
-    )
-    df.drop_duplicates(subset=["query_name", "reference_name"], inplace=True)
+    df.sort_values(by=det_dup_cols + ["matches"], inplace=True, ascending=False)
+    df.drop_duplicates(subset=det_dup_cols, inplace=True)
+
     # extract the position from the name and add it to the start and end
     q_fix = df.query_name.str.extract(r"(.+):(\d+)-\d+", expand=True)
     df.query_name = q_fix[0]
@@ -51,6 +61,10 @@ if __name__ == "__main__":
     df.reference_name = r_fix[0]
     df.reference_start = r_fix[1].astype(int)
     df.reference_end = r_fix[1].astype(int) + args.window
+
+    # remove same reference comparisons in 1-1 mode
+    if args.one:
+        df = df[df.reference_name != df.query_name]
 
     # limit the size if we go over the chr end
     fai = pd.read_csv(args.fai, sep="\t", names=["chr", "length", "x", "y", "z"])[
