@@ -26,12 +26,16 @@ F = config.pop("mm_f", 10000)
 S = config.pop("mm_s", int(W / 5))
 TEMP_DIR = config.pop("tempdir", "temp")
 SAMTOOLS_MEM = config.pop("samtools_mem", 1)
+SLIDE = config.pop("slide", 0)
+
+assert W > SLIDE, f"window ({W}) must be larger than slide ({SLIDE})."
 
 # short vs long read mapping
 MAP_PARAMS = "-ax ava-ont "
 if W < 500:
     MAP_PARAMS = " -a --no-pairing -k21 --sr -A2 -B8 -O12,32 -E2,1 -r100 -g100 -2K50m --heap-sort=yes -X -w 5 -e0 "
-
+elif SLIDE > 0:
+    MAP_PARAMS = "-ax map-ont"
 
 if TEMP_DIR != "temp":
     if os.path.exists("temp"):
@@ -122,9 +126,11 @@ rule make_windows:
     threads: 1
     resources:
         mem=1,
+    params:
+        slide=f"-s {SLIDE}" if SLIDE > 0 else "",
     shell:
         """
-        bedtools makewindows -g {input.fai} -w {wildcards.W} > {output.bed}
+        bedtools makewindows -g {input.fai} -w {wildcards.W} {params.slide} > {output.bed}
         """
 
 
@@ -169,7 +175,7 @@ rule window_fa:
 
 rule aln_prep:
     input:
-        split_ref=rules.window_fa.output.fasta,
+        ref=FASTA if SLIDE > 0 else rules.window_fa.output.fasta,
     output:
         split_ref_index=temp("temp/{SM}.{W}.{F}.fasta.mmi"),
     conda:
@@ -188,7 +194,7 @@ rule aln_prep:
             -f {wildcards.F} -s {params.S} \
             {params.MAP_PARAMS} \
              -d {output.split_ref_index} \
-            {input.split_ref} 
+            {input.ref} 
         """
 
 
@@ -319,7 +325,7 @@ rule pair_end_bed:
         mem=64,
     params:
         sdir=SDIR,
-        one="--one" if "one" in config else "",
+        one="--one" if SLIDE > 0 else "",
     shell:
         """
         {params.sdir}/scripts/refmt.py \
@@ -363,7 +369,7 @@ rule make_figures:
 
 
 #
-# for large scale vizualization
+# for large scale visualization
 #
 rule cooler_strand:
     input:
