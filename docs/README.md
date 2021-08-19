@@ -96,3 +96,5 @@ snakemake --use-conda --cores 24 cooler_density --config window=32 cooler_window
 
 - Allow users to adjust the color pallet used in R
 - Test short read aligners with smaller window sizes
+- Make a more intelligent fragmentation method that won't be affected by offsets in repeat motifs
+- Consider alternative ways to score cells with multiple non-overlapping alignments
