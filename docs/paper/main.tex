@@ -25,9 +25,9 @@
 
 \title[StainedGlass]{StainedGlass: Making colorful dot-plots of genomic sequence}
 \author[Vollger \textit{et~al}.]{
-	Mitchell R. Vollger\,$^{\text{\sfb 1,}*}$,
+	Mitchell R. Vollger\,$^{\text{\sfb 1,}}$,
 	Peter Kerpedjiev\,$^{\text{\sfb 2}}$, 
-	Adam M. Phillippy\,$^{\text{\sfb 3,*}}$, 
+	Adam M. Phillippy\,$^{\text{\sfb 3,}}$, 
 	and Evan E. Eichler\,$^{\text{\sfb 1,4,}*}$}
 \address{
 	$^{\text{\sf 1}}$Genome Sciences,
@@ -47,16 +47,10 @@
 
 \abstract{
 \textbf{Summary:} 
-Visualization of genomic repeats is often accomplished through the use of 
-dot plots; however, the emergence of telomere-to-telomere assemblies
-with multi-megabase repeats requires new visualization strategies. Here, 
-we introduce StainedGlass which can generate publication quality figures 
-that communicate the identity and orientation of 
-multi-megabase repeats while scaling to entire genomes. \\
+Visualization and analysis of genomic repeats is typically accomplished through the use of dot plots; however, the emergence of telomere-to-telomere assemblies with multi-megabase repeats requires new visualization strategies. Here, we introduce StainedGlass which can generate publication quality figures and interactive visualizations that depict the identity and orientation of multi-megabase repeat structures at a genome-wide scale. The tool can rapidly reveal higher-order structures and improve the inference of evolutionary history for some of the most complex regions of genomes.
+\\
 \textbf{Availability and implementation:} 
-StainedGlass is implemented using \href{https://snakemake.github.io}{snakemake}
-and is available open source under the MIT license at 
-\href{https://mrvollger.github.io/StainedGlass}{mrvollger.github.io/StainedGlass/}.\\
+StainedGlass is implemented using \href{https://snakemake.github.io}{Snakemake} and is available open source under the MIT license at \href{https://mrvollger.github.io/StainedGlass}{mrvollger.github.io/StainedGlass/}.\\
 \textbf{Contact:} \href{mvollger@uw.edu}{mvollger@uw.edu}\\
 }
 
@@ -93,7 +87,7 @@ customizable workflow so that it can be applied to new genomes.
 %%--------------------------------------------------------------------------%%
 \begin{figure*}[!tpb]%figure1
 \centerline{
-	\includegraphics[width=0.95\textwidth,keepaspectratio]{figure1.png}
+	\includegraphics[width=0.95\textwidth,keepaspectratio,,natwidth=7200,natheight=4800]{figure1.png}
 }
 \caption{Output from StainedGlass showing the sequence identity within human
 chromosome 8.}
