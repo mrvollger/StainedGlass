@@ -246,7 +246,8 @@
   \let\@oddfoot\@empty%
   \let\@evenfoot\@empty%
   \def\@evenhead{\vbox{\hbox to \textwidth{\fontsize{8}{10}\selectfont
-        {\helveticabold{\selectfont\thepage}}\hfill\helveticaitalic{\fontshape{sl}\selectfont
+        {\helveticabold{\selectfont\thepage}}
+        \hfill\helveticaitalic{\fontshape{sl}\selectfont
         \strut\leftmark}}\vspace{5\p@}\rule{\textwidth}{1\p@}}}%
   \def\@oddhead{\vbox{\hbox to \textwidth{\fontsize{8}{10}\selectfont
         {\helveticaitalic{\fontshape{it}\selectfont\strut\rightmark}}\hfill{\helveticabold{\thepage}}}%
@@ -258,14 +259,14 @@
 \def\ps@opening
   {%
   \def\@oddfoot{{
-        \hbox to \textwidth{\helvetica
+        %\hbox to \textwidth{\helvetica
         %\fontsize{7}{9}\fontshape{n}\selectfont \copyright\space The Author \@copyrightyear. Published by Oxford University Press. All rights reserved. For permissions, please e-mail: journals.permissions@oup.com%
-          \hfill\small\helveticabold\thepage}%
+         % \hfill\small\helveticabold\thepage}%
         }}%
   \def\@evenfoot{{
-        \hbox to \textwidth{\helvetica\thepage\hfill
+        %\hbox to \textwidth{\helvetica\thepage\hfill
          % \fontsize{7}{9}\fontshape{n}\selectfont The Author \@copyrightyear. Published by Oxford University Press. All rights reserved. For permissions, please e-mail: journals.permissions@oup.com
-          }%
+         % }%
         }}%
   \let\@evenhead\relax
   \let\@oddhead\relax}
