@@ -6,6 +6,17 @@ from snakemake.utils import min_version
 
 min_version("6.0")
 
+bold = "\033[1m"
+green = "\033[92m"
+cyan = "\033[36m"
+end = "\033[0m"
+msg = f"""{green}{bold}Thanks for using StainedGalss and please remember to cite the tool!{end}{end}
+    {cyan}Vollger, Mitchell R., Peter Kerpedjiev, Adam M. Phillippy, and Evan E. Eichler. 2021.
+        “StainedGlass: Interactive Visualization of Massive Tandem Repeat Structures with Identity Heatmaps.” 
+        BioRxiv. https://doi.org/10.1101/2021.08.19.457003. {end}
+"""
+sys.stderr.write(msg)
+
 SDIR = os.path.realpath(os.path.dirname(srcdir("Snakefile")))
 shell.prefix(f"set -eo pipefail; ")
 
@@ -62,7 +73,7 @@ lengths = [math.ceil(int(line.split()[1]) / W) for line in open(FAI).readlines()
 N_WINDOWS = int(sum(lengths))
 N = min(N, N_WINDOWS)
 IDS = list(range(N))
-sys.stderr.write("N batches {} \n".format(N))
+sys.stderr.write(f"[INFO] The sequence will be split into {N} batches.\n")
 
 
 localrules:
