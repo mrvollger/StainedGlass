@@ -116,6 +116,8 @@ Then to generate the cooler files that can be loaded in HiGlass we ran the follo
 time snakemake --cores 8 --config sample=arabidopsis fasta=Col-CEN_v1.2.fasta --use-conda  make_figures cooler
 ```
 
+The results can be viewed at [resgen.io/paper-data/Naish](https://resgen.io/paper-data/Naish%202021%20-%20Arabidopsis/views/EYd0Kq5XTY6jhKpCK08Jjg/).
+
 ### Arabidopsis runtime statistics:
 
 | step                | user      | system  | cpu  | wall       |

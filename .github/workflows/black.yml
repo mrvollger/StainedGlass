@@ -1,13 +1,12 @@
-
 name: black
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -17,10 +16,8 @@ jobs:
   black:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Checkout submodules
-      uses: textbook/git-checkout-submodule-action@2.0.0
-    - name: Test black Formatting
-      uses: lgeiger/black-action@master
-      with:
-        args: ". --check"
+      - uses: actions/checkout@v2
+      - name: Test black Formatting
+      - uses: psf/black@stable
+        with:
+          args: ". --check"
