@@ -205,7 +205,8 @@ rule aln_prep:
             -f {wildcards.F} -s {params.S} \
             {params.MAP_PARAMS} \
              -d {output.split_ref_index} \
-            {input.ref} 
+            {input.ref} \
+        2> {log}
         """
 
 
@@ -228,7 +229,7 @@ rule aln:
         mem=4,
     shell:
         """
-        minimap2 \
+        ( minimap2 \
             -t {threads} \
             -f {wildcards.F} -s {params.S} \
             {params.MAP_PARAMS} \
@@ -236,7 +237,8 @@ rule aln:
             {input.split_ref} \
             <( bedtools getfasta -fi {input.ref} -bed {input.bed} ) \
             | samtools sort -m {resources.mem}G \
-            -o {output.aln}
+            -o {output.aln} \
+        ) 2> {log}
         """
 
 
@@ -355,7 +357,19 @@ rule make_R_figures:
         bed=rules.pair_end_bed.output.bed,
     output:
         pdf="results/{SM}.{W}.{F}_figures/pdfs/{SM}.{W}.{F}.tri.TRUE__onecolorscale.FALSE__all.pdf",
-        png="results/{SM}.{W}.{F}_figures/pngs/{SM}.{W}.{F}.tri.TRUE__onecolorscale.FALSE__all.png",
+        png=report(
+            expand(
+                "results/{SM}.{W}.{F}_figures/pngs/{SM}.{W}.{F}.tri.{first}__onecolorscale.{second}__all.png",
+                allow_missing=True,
+                first=["TRUE", "FALSE"],
+                second=["TRUE", "FALSE"],
+            ),
+            category="figures",
+        ),
+        facet=report(
+            "results/{SM}.{W}.{F}_figures/pngs/{SM}.{W}.{F}.facet.all.png",
+            category="figures",
+        ),
     conda:
         "envs/R.yaml"
     threads: 8
@@ -408,9 +422,6 @@ rule cooler_strand:
                 --zero-based \
                 - {output.cool}
         """
-
-
-# | cut -f 8 | head  -n 1000000 | sort | uniq -c
 
 
 rule cooler_identity:
