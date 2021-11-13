@@ -1,3 +1,9 @@
+---
+title: "StainedGlass"
+toc: true
+toc_label: "Table of contents"
+---
+
 # StainedGlass
 
 [![Actions Status](https://github.com/mrvollger/StainedGlass/workflows/CI/badge.svg)](https://github.com/mrvollger/StainedGlass/actions)
