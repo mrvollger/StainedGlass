@@ -121,24 +121,24 @@ The results can be viewed at [resgen.io/paper-data/Naish](https://resgen.io/pape
 
 ### Arabidopsis runtime statistics:
 
-| step                | user      | system  | cpu  | wall       |
-| ------------------- | --------- | ------- | ---- | ---------- |
-| alignment           | 16014.07s | 163.41s | 481% | 56:00.57   |
-| cooler              | 544.51s   | 32.98s  | 213% | 4:30.64    |
-| static figures [^1] | 2635.30s  | 188.07s | 58%  | 1:20:14.59 |
+| step                    | window (bp) | user (s)  | system (s) | cpu (%) | wall (h:m:s) |
+| ----------------------- | ----------- | --------- | ---------- | ------- | ------------ |
+| alignment               | 1,000       | 16,014.07 | 163.41     | 481     | 56:00.57     |
+| cooler                  | 1,000       | 544.51    | 32.98      | 213     | 4:30.64      |
+| static figures [^tnote] | 1,000       | 2,635.30  | 188.07     | 58      | 1:20:14.59   |
 
-[^1]: Not recommended for whole genomes.
+[^tnote]: Not recommended for whole genomes.
 
 A full report of all steps executed and the runtime of those steps is available in
 [case-example-arabidopsis/report.html](case-example-arabidopsis/report.html).
 
-## TODO
+# TODO
 
 - Allow users to adjust the color pallet used in R
 - Test short read aligners with smaller window sizes
 - Make a more intelligent fragmentation method that won't be affected by offsets in repeat motifs
 - Consider alternative ways to score cells with multiple non-overlapping alignments
 
-## Cite
+# Cite
 
 Vollger, Mitchell R., Peter Kerpedjiev, Adam M. Phillippy, and Evan E. Eichler. 2021. “StainedGlass: Interactive Visualization of Massive Tandem Repeat Structures with Identity Heatmaps.” BioRxiv. https://doi.org/10.1101/2021.08.19.457003.
