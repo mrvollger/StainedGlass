@@ -93,7 +93,7 @@ coloring is proportionally to the number of reads mapped to each bin, use the fo
 snakemake --use-conda --cores 24 cooler_density --config window=32 cooler_window=100
 ```
 
-# Arabidopsis case example and benchmark
+## Arabidopsis: quick start, case example, and benchmark
 
 To demonstrate a case example of using StainedGlass we applied the tool to a chromosome level assembly of arabidopsis ([DOI:10.1126/science.abi7489](https://doi.org/10.1126/science.abi7489)).
 
@@ -109,7 +109,7 @@ Using 8 cores on a laptop with 32 GB of ram we ran StainedGlass using the follow
 time snakemake --cores 8 --config sample=arabidopsis fasta=Col-CEN_v1.2.fasta --use-conda
 ```
 
-This command generated 41,036,963 self-self pairwise alignments within the assembly of which 16,699,976 passed filters for downstream analysis.
+This command generated 41,036,963 self-self pairwise alignments within the assembly, 16,699,976 of which passed filters for downstream analysis.
 
 Then to generate the cooler files that can be loaded in HiGlass we ran the following command with the already computed alignments:
 
@@ -132,13 +132,13 @@ The results can be viewed at [resgen.io/paper-data/Naish](https://resgen.io/pape
 A full report of all steps executed and the runtime of those steps is available in
 [case-example-arabidopsis/report.html](case-example-arabidopsis/report.html).
 
-# TODO
+## TODO
 
 - Allow users to adjust the color pallet used in R
 - Test short read aligners with smaller window sizes
 - Make a more intelligent fragmentation method that won't be affected by offsets in repeat motifs
 - Consider alternative ways to score cells with multiple non-overlapping alignments
 
-# Cite
+## Cite
 
 Vollger, Mitchell R., Peter Kerpedjiev, Adam M. Phillippy, and Evan E. Eichler. 2021. “StainedGlass: Interactive Visualization of Massive Tandem Repeat Structures with Identity Heatmaps.” BioRxiv. https://doi.org/10.1101/2021.08.19.457003.
