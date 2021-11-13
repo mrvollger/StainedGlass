@@ -10,7 +10,7 @@ This is a repository for making colorful identity heatmaps of genomic sequence.
 
 # Contents
 
-- TOC {:toc}
+* TOC {:toc}
 
 ## Installation
 
