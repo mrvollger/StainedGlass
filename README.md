@@ -113,7 +113,7 @@ This command generated 41,036,963 self-self pairwise alignments within the assem
 Then to generate the cooler files that can be loaded in HiGlass we ran the following command with the already computed alignments:
 
 ```shell
-time snakemake --cores 8 --config sample=arabidopsis fasta=Col-CEN_v1.2.fasta --use-conda  make_figures cooler
+time snakemake --cores 8 --config sample=arabidopsis fasta=Col-CEN_v1.2.fasta --use-conda cooler
 ```
 
 The results can be viewed at [resgen.io/paper-data/Naish](https://resgen.io/paper-data/Naish%202021%20-%20Arabidopsis/views/EYd0Kq5XTY6jhKpCK08Jjg/).
