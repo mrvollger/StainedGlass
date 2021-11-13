@@ -8,7 +8,9 @@
 This is a repository for making colorful identity heatmaps of genomic sequence.
 ![](images/chr8.png "chr8 cen")
 
-{:toc}
+# Contents
+
+- TOC {:toc}
 
 ## Installation
 
