@@ -8,6 +8,8 @@
 This is a repository for making colorful identity heatmaps of genomic sequence.
 ![](images/chr8.png "chr8 cen")
 
+{:toc}
+
 ## Installation
 
 To install you can follow the directions on the [usage page](https://snakemake.github.io/snakemake-workflow-catalog?usage=mrvollger/StainedGlass) or use the information below.
