@@ -1,2 +1,6 @@
+title: StainedGlass
+logo: /images/chr8.png
+description: Identity heatmaps of genomic sequence
+show_downloads: true
+google_analytics:
 theme: jekyll-theme-minimal
-markdown: kramdown
