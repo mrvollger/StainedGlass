@@ -30,7 +30,7 @@ configfile: "config/config.yaml"
 N = config.pop("nbatch", 1)
 NUM_DUPS = config.pop("num_dups", 100)
 SM = config.pop("sample", "sample")
-W = config.pop("window", 5000)
+W = config.pop("window", 2000)
 CW = config.pop("cooler_window", int(W))
 ALN_T = config.pop("alnthreads", 4)
 F = config.pop("mm_f", 10000)
