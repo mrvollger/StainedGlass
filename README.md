@@ -120,11 +120,11 @@ The results can be viewed at [resgen.io/paper-data/Naish](https://resgen.io/pape
 
 ### Arabidopsis runtime statistics:
 
-| step                    | window (bp) | user (s)  | system (s) | cpu (%) | wall (h:m:s) |
-| ----------------------- | ----------- | --------- | ---------- | ------- | ------------ |
-| alignment               | 1,000       | 16,014.07 | 163.41     | 481     | 56:00.57     |
-| cooler                  | 1,000       | 544.51    | 32.98      | 213     | 4:30.64      |
-| static figures [^tnote] | 1,000       | 2,635.30  | 188.07     | 58      | 1:20:14.59   |
+| step                    | window (bp) | user (s)  | system (s) | cpu (%) | wall (h\:m\:s) |
+| ----------------------- | ----------- | --------- | ---------- | ------- | -------------- |
+| alignment               | 1,000       | 16,014.07 | 163.41     | 481     | 56:00.57       |
+| cooler                  | 1,000       | 544.51    | 32.98      | 213     | 4:30.64        |
+| static figures [^tnote] | 1,000       | 2,635.30  | 188.07     | 58      | 1:20:14.59     |
 
 [^tnote]: Not recommended for whole genomes.
 
