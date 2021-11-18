@@ -116,7 +116,7 @@ Then to generate the cooler files that can be loaded in HiGlass we ran the follo
 time snakemake --cores 8 --config sample=arabidopsis fasta=Col-CEN_v1.2.fasta --use-conda cooler
 ```
 
-The results can be viewed at [resgen.io/paper-data/Naish](https://resgen.io/paper-data/Naish%202021%20-%20Arabidopsis/views/EYd0Kq5XTY6jhKpCK08Jjg/). And we include a static view of the centromeres here:
+The results can be viewed at [resgen.io/paper-data/Naish](https://resgen.io/paper-data/Naish%202021%20-%20Arabidopsis/views/EYd0Kq5XTY6jhKpCK08Jjg/), and we include a static view of the centromeres here:
 
 ![Arabidopsis CENs](images/CENs_Arabidopsis.2000.10000.tri.TRUE__onecolorscale.TRUE__all.png)
 
