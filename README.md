@@ -94,7 +94,7 @@ snakemake --use-conda --cores 24 cooler_density --config window=32 cooler_window
 
 ## Arabidopsis: quick start, case example, and benchmark
 
-To demonstrate a case example of using StainedGlass we applied the tool to a chromosome level assembly of arabidopsis ([DOI:10.1126/science.abi7489](https://doi.org/10.1126/science.abi7489)).
+To demonstrate a case example of using StainedGlass we applied the tool to a 132 Mbp chromosome level assembly of the Arabidopsis genome ([DOI:10.1126/science.abi7489](https://doi.org/10.1126/science.abi7489)).
 
 ```shell
 wget https://github.com/schatzlab/Col-CEN/raw/main/v1.2/Col-CEN_v1.2.fasta.gz \
