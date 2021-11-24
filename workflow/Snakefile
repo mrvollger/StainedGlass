@@ -158,10 +158,10 @@ rule split_windows:
     resources:
         mem=1,
     params:
-        sdir=SDIR,
+        script=workflow.source_path("scripts/batch_bed_files.py"),
     shell:
         """
-        {params.sdir}/scripts/batch_bed_files.py {input.bed} --outputs {output.bed}
+        python {params.script} {input.bed} --outputs {output.bed}
         """
 
 
@@ -306,7 +306,7 @@ rule identity:
         "envs/env.yaml"
     threads: 8
     params:
-        sdir=SDIR,
+        script=workflow.source_path("scripts/samIdentity.py"),
         S=S,
     log:
         "logs/identity.{SM}.{W}.{F}.log",
@@ -315,7 +315,7 @@ rule identity:
     threads: 8
     shell:
         """
-        {params.sdir}/scripts/samIdentity.py --threads {threads} \
+        python {params.script} --threads {threads} \
             --matches  {params.S} --header \
             {input.aln} \
             | pigz -p {threads} > {output.tbl}
@@ -337,11 +337,11 @@ rule pair_end_bed:
     resources:
         mem=64,
     params:
-        sdir=SDIR,
+        script=workflow.source_path("scripts/refmt.py"),
         one="--one" if SLIDE > 0 else "",
     shell:
         """
-        {params.sdir}/scripts/refmt.py \
+        python {params.script} \
             --window {wildcards.W} --fai {input.fai} \
             --full {output.full} \
             {params.one} \
@@ -376,12 +376,12 @@ rule make_R_figures:
     log:
         "logs/make_R_figures.{SM}.{W}.{F}.log",
     params:
-        sdir=SDIR,
+        script=workflow.source_path("scripts/aln_plot.R"),
     resources:
         mem=64,
     shell:
         """
-        Rscript {params.sdir}/scripts/aln_plot.R \
+        Rscript {params.script} \
             --bed {input.bed} \
             --threads {threads} \
             --prefix {wildcards.SM}.{wildcards.W}.{wildcards.F}
@@ -538,11 +538,11 @@ rule create_contacts:
     log:
         "logs/create_contacts_{SM}_{W}.log",
     params:
-        sdir=SDIR,
+        script=workflow.source_path("scripts/ntn_bam_to_contacts.py"),
     threads: 1
     shell:
         """
-        gunzip -c {input.sam} | {params.sdir}/scripts/ntn_bam_to_contacts.py - \
+        gunzip -c {input.sam} | python {params.script} - \
             | gzip > {output.contacts}
         """
 
