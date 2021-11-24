@@ -12,9 +12,9 @@ dependencies:
   - r::r-tidyverse
   - r-data.table
   - r-cowplot
-  - r-argparse
+  - r-argparse>=2.1.2
   - r-glue
   - r::r-rcolorbrewer
-  - r::r-scales 
+  - r::r-scales
   - r::r-ggplot2
   - r-r.utils
