@@ -1,12 +1,12 @@
 name: CI
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -16,21 +16,20 @@ jobs:
   regular_windows:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Test workflow on regular sized windows
-      uses: snakemake/snakemake-github-action@v1.19.0
-      with:
-        directory: .
-        snakefile: workflow/Snakefile
-        args: "--use-conda -j 3 --conda-cleanup-pkgs cache --conda-frontend mamba -p make_figures cooler cooler_density"
+      - uses: actions/checkout@v2
+      - name: Test workflow on regular sized windows
+        uses: snakemake/snakemake-github-action@v1.23.0
+        with:
+          directory: .
+          snakefile: workflow/Snakefile
+          args: "--use-conda -j 3 --conda-cleanup-pkgs cache --conda-frontend mamba -p make_figures cooler cooler_density"
   small_windows:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Test workflow on small windows
-      uses: snakemake/snakemake-github-action@v1.19.0
-      with:
-        directory: .
-        snakefile: workflow/Snakefile
-        args: "--use-conda -j 3 --conda-cleanup-pkgs cache --conda-frontend mamba --config window=400 -p make_figures cooler cooler_density"
-  
+      - uses: actions/checkout@v2
+      - name: Test workflow on small windows
+        uses: snakemake/snakemake-github-action@v1.23.0
+        with:
+          directory: .
+          snakefile: workflow/Snakefile
+          args: "--use-conda -j 3 --conda-cleanup-pkgs cache --conda-frontend mamba --config window=400 -p make_figures cooler cooler_density"

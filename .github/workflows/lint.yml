@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Test linting
-        uses: snakemake/snakemake-github-action@v1.18.0
+        uses: snakemake/snakemake-github-action@v1.23.0
         with:
           directory: .
           snakefile: workflow/Snakefile
