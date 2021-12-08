@@ -46,7 +46,8 @@ MAP_PARAMS = "-ax ava-ont "
 if W < 500:
     MAP_PARAMS = " -a --no-pairing -k21 --sr -A2 -B8 -O12,32 -E2,1 -r100 -g100 -2K50m --heap-sort=yes -X -w 5 -e0 "
 elif SLIDE > 0:
-    MAP_PARAMS = "-ax map-ont"
+    S = config.pop("mm_s", 100)
+    MAP_PARAMS = "-ax map-ont --secondary=no"
 
 if TEMP_DIR != "temp":
     if os.path.exists("temp"):
@@ -70,6 +71,8 @@ if not os.path.exists(FAI):
 # setup split and gather
 #
 lengths = [math.ceil(int(line.split()[1]) / W) for line in open(FAI).readlines()]
+names = [line.split()[0] for line in open(FAI).readlines()]
+REF_IDS = [f"ref_{i}" for i in range(len(names))] if SLIDE > 0 else ["ref_0"]
 N_WINDOWS = int(sum(lengths))
 N = min(N, N_WINDOWS)
 IDS = list(range(N))
@@ -100,6 +103,7 @@ localrules:
 
 wildcard_constraints:
     ID="|".join(map(str, IDS)),
+    REF_ID="|".join(map(str, REF_IDS)),
     SM=SM,
     W=W,
     F=F,
@@ -180,19 +184,40 @@ rule window_fa:
         mem=4,
     shell:
         """
-        bedtools getfasta -fi {input.ref} -bed {input.bed} > {output.fasta}
+        bedtools getfasta -fi {input.ref} -bed {input.bed} \
+            > {output.fasta}
+        """
+
+
+rule split_fa:
+    input:
+        ref=FASTA,
+    output:
+        fasta=temp("temp/{SM}.{W}.{REF_ID}.split.fasta"),
+    conda:
+        "envs/env.yaml"
+    log:
+        "logs/split_fa.{SM}.{W}.{REF_ID}.log",
+    threads: 1
+    params:
+        name=lambda wc: names[int(wc.REF_ID.strip("ref_"))],
+    resources:
+        mem=4,
+    shell:
+        """
+        samtools faidx {input.ref} {params.name} > {output.fasta} 
         """
 
 
 rule aln_prep:
     input:
-        ref=FASTA if SLIDE > 0 else rules.window_fa.output.fasta,
+        ref=rules.split_fa.output.fasta if SLIDE > 0 else rules.window_fa.output.fasta,
     output:
-        split_ref_index=temp("temp/{SM}.{W}.{F}.fasta.mmi"),
+        split_ref_index=temp("temp/{SM}.{W}.{F}.{REF_ID}.fasta.mmi"),
     conda:
         "envs/env.yaml"
     log:
-        "logs/aln_pref.{SM}.{W}.{F}.log",
+        "logs/aln_prep.{SM}.{W}.{F}.{REF_ID}.log",
     threads: 1
     params:
         S=S,
@@ -210,17 +235,36 @@ rule aln_prep:
         """
 
 
-rule aln:
+rule query_prep:
     input:
         ref=FASTA,
         bed="temp/{SM}.{W}.{ID}.bed",
-        split_ref=rules.aln_prep.output.split_ref_index,
     output:
-        aln=temp("temp/{SM}.{W}.{F}.{ID}.bam"),
+        query_fasta=temp("temp/{SM}.{W}.{ID}.query.fasta"),
     conda:
         "envs/env.yaml"
     log:
-        "logs/aln.{SM}.{W}.{F}.{ID}.log",
+        "logs/query_prep.{SM}.{W}.{ID}.log",
+    threads: 1
+    resources:
+        mem=4,
+    shell:
+        """
+        bedtools getfasta -fi {input.ref} -bed {input.bed} \
+            > {output.query_fasta}
+        """
+
+
+rule aln:
+    input:
+        split_ref=rules.aln_prep.output.split_ref_index,
+        query=rules.query_prep.output.query_fasta,
+    output:
+        aln=temp("temp/{SM}.{W}.{F}.{ID}.{REF_ID}.bam"),
+    conda:
+        "envs/env.yaml"
+    log:
+        "logs/aln.{SM}.{W}.{F}.{ID}.{REF_ID}.log",
     threads: ALN_T
     params:
         S=S,
@@ -234,17 +278,21 @@ rule aln:
             -f {wildcards.F} -s {params.S} \
             {params.MAP_PARAMS} \
             --dual=yes --eqx \
-            {input.split_ref} \
-            <( bedtools getfasta -fi {input.ref} -bed {input.bed} ) \
-            | samtools sort -m {resources.mem}G \
-            -o {output.aln} \
+            {input.split_ref} {input.query} \
+                | samtools sort -m {resources.mem}G \
+                    -o {output.aln} \
         ) 2> {log}
         """
 
 
 rule merge_list:
     input:
-        aln=expand("temp/{SM}.{W}.{F}.{ID}.bam", ID=IDS, allow_missing=True),
+        aln=expand(
+            "temp/{SM}.{W}.{F}.{ID}.{REF_ID}.bam",
+            ID=IDS,
+            REF_ID=REF_IDS,
+            allow_missing=True,
+        ),
     output:
         alns=temp("temp/{SM}.{W}.{F}.list"),
     threads: 1
@@ -259,8 +307,12 @@ rule merge_list:
 rule merge_aln:
     input:
         alns=rules.merge_list.output.alns,
-        aln=expand("temp/{SM}.{W}.{F}.{ID}.bam", ID=IDS, allow_missing=True),
-        split_ref=rules.window_fa.output.fasta,
+        aln=expand(
+            "temp/{SM}.{W}.{F}.{ID}.{REF_ID}.bam",
+            REF_ID=REF_IDS,
+            ID=IDS,
+            allow_missing=True,
+        ),
     output:
         aln=temp("temp/{SM}.{W}.{F}.bam"),
     conda:
@@ -272,9 +324,8 @@ rule merge_aln:
         mem=4,
     shell:
         """
-        samtools cat \
-              -b {input.alns} \
-              -o {output.aln} 
+        #samtools cat -b {input.alns} -o {output.aln} 
+        samtools merge -b {input.alns} {output.aln} 
         """
 
 
