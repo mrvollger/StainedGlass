@@ -142,4 +142,4 @@ A full report of all steps executed and the runtime of those steps is available 
 
 ## Cite
 
-Vollger, Mitchell R., Peter Kerpedjiev, Adam M. Phillippy, and Evan E. Eichler. 2021. “StainedGlass: Interactive Visualization of Massive Tandem Repeat Structures with Identity Heatmaps.” BioRxiv. https://doi.org/10.1101/2021.08.19.457003.
+Mitchell R Vollger, Peter Kerpedjiev, Adam M Phillippy, Evan E Eichler, StainedGlass: Interactive visualization of massive tandem repeat structures with identity heatmaps, Bioinformatics, 2022; https://doi.org/10.1093/bioinformatics/btac018
