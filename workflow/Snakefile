@@ -13,8 +13,8 @@ end = "\033[0m"
 msg = f"""{green}{bold}Thanks for using StainedGlass and please remember to cite the tool!{end}{end}
     {cyan}Mitchell R Vollger, Peter Kerpedjiev, Adam M Phillippy, Evan E Eichler.
             "StainedGlass: Interactive visualization of massive tandem repeat structures with identity heatmaps"
-            Bioinformatics, 2022; https://doi.org/10.1093/bioinformatics/btac018
- {end}
+            Bioinformatics, 2022; https://doi.org/10.1093/bioinformatics/btac018{end}
+
 """
 sys.stderr.write(msg)
 
