@@ -10,10 +10,11 @@ bold = "\033[1m"
 green = "\033[92m"
 cyan = "\033[36m"
 end = "\033[0m"
-msg = f"""{green}{bold}Thanks for using StainedGalss and please remember to cite the tool!{end}{end}
-    {cyan}Vollger, Mitchell R., Peter Kerpedjiev, Adam M. Phillippy, and Evan E. Eichler. 2021.
-        “StainedGlass: Interactive Visualization of Massive Tandem Repeat Structures with Identity Heatmaps.” 
-        BioRxiv. https://doi.org/10.1101/2021.08.19.457003. {end}
+msg = f"""{green}{bold}Thanks for using StainedGlass and please remember to cite the tool!{end}{end}
+    {cyan}Mitchell R Vollger, Peter Kerpedjiev, Adam M Phillippy, Evan E Eichler.
+            "StainedGlass: Interactive visualization of massive tandem repeat structures with identity heatmaps"
+            Bioinformatics, 2022; https://doi.org/10.1093/bioinformatics/btac018
+ {end}
 """
 sys.stderr.write(msg)
 
