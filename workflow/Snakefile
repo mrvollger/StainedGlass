@@ -45,7 +45,7 @@ assert W > SLIDE, f"window ({W}) must be larger than slide ({SLIDE})."
 # short vs long read mapping
 MAP_PARAMS = "-ax ava-ont "
 if W < 500:
-    MAP_PARAMS = " -a --no-pairing -k21 --sr -A2 -B8 -O12,32 -E2,1 -r100 -g100 -2K50m --heap-sort=yes -X -w 5 -e0 "
+    MAP_PARAMS = " -a --no-pairing -k21 --sr -A2 -B8 -O12,32 -E2,1 -r100 -g100 --heap-sort=yes -X -w 5 -e0 "
 elif SLIDE > 0:
     S = config.pop("mm_s", 100)
     MAP_PARAMS = "-ax map-ont --secondary=no"
