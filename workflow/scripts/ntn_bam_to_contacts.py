@@ -100,7 +100,7 @@ def main():
                     # print('extra field:', extra_field, file=sys.stderr)
                     alignments += parse_extra_alignments(extra_field)
 
-            for (mapped_seq, mapped_pos) in alignments:
+            for mapped_seq, mapped_pos in alignments:
                 print(
                     "{}\t{}\t{}\t{}\t{}\t{}\t1".format(
                         original_location[0],
