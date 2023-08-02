@@ -1,11 +1,11 @@
 name: R
 channels:
-  - bioconda
   - conda-forge
+  #- bioconda
   - defaults
 dependencies:
-  - xorg-libx11
-  - xorg-libxau
+  #- xorg-libx11
+  #- xorg-libxau
   - r-base>=4.0
   - r-essentials
   - r-cairo
