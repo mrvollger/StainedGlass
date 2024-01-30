@@ -14,7 +14,7 @@ To install you can follow the directions on the [usage page](https://snakemake.g
 You will need a current version of `snakemake` to run this workflow. To get `snakemake` please follow the install [instructions](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) on their website, but in brief once `conda` and `mamba` are installed you can install `snakemake` with:
 
 ```
-mamba create -n snakemake -c conda-forge -c bioconda snakemake
+mamba create -n snakemake -c conda-forge -c bioconda 'snakemake>=8'
 ```
 
 Afterwards you can activate the `conda` environment and download the repository. And all additional dependencies will be handled by `snakemake`.
@@ -31,20 +31,20 @@ Choose a sample identifier for your run e.g. `chr8` and a fasta file on which yo
 Once this is done and you have activated your `conda` env with `snakemake` you can run the pipeline like so:
 
 ```
-snakemake --use-conda --cores 24
+snakemake --cores 24
 ```
 
 Or do a dry run of the pipeline:
 
 ```
-snakemake --use-conda --cores 24 -n
+snakemake --cores 24 -n
 ```
 
 All parameters are described in `config/README.md` and you can modify any of them
 by modifying `config/config.yaml`. You can also change the configuration via the command line. For example, to change the `sample` identifier and `fasta` options do:
 
 ```
-snakemake --use-conda --cores 24 --config sample=test2 fasta=/some/fasta/path.fa
+snakemake --cores 24 --config sample=test2 fasta=/some/fasta/path.fa
 ```
 
 Please try the test case with the default configuration file before submitting issues.
@@ -59,7 +59,7 @@ The file `results/{sample}.{\d+}.{\d+}.bed` will contain all the alignments iden
 To make pdfs and pngs for a particular set of regions just add `make_figures` to your command. This is generally appropriate for comparing up to ~5 regions totaling at most ~40 Mbp.
 
 ```
-snakemake --use-conda --cores 24 make_figures
+snakemake --cores 24 make_figures
 ```
 
 This will make an output directory under `results/{sample}.{\d+}.{\d+}_figures` with a variety of dot plots in `pdf` and `png` format.
@@ -71,7 +71,7 @@ If you see `tri.TRUE` in the output pdf/png it means that the dot plot is rotate
 Making an interactive whole genome visualization requires the use of the program [HiGlass](https://higlass.io/) and a web browser. However, this pipeline will make the necessary input files with the following command:
 
 ```
-snakemake --use-conda --cores 24 cooler
+snakemake --cores 24 cooler
 ```
 
 To view locally, use `higlass-manage`:
@@ -89,7 +89,7 @@ To create a high-resolution interactive visualization where the
 coloring is proportionally to the number of reads mapped to each bin, use the following command:
 
 ```
-snakemake --use-conda --cores 24 cooler_density --config window=32 cooler_window=100
+snakemake --cores 24 cooler_density --config window=32 cooler_window=100
 ```
 
 ## Arabidopsis: quick start, case example, and benchmark
@@ -105,7 +105,7 @@ wget https://github.com/schatzlab/Col-CEN/raw/main/v1.2/Col-CEN_v1.2.fasta.gz \
 Using 8 cores on a laptop with 32 GB of ram we ran StainedGlass using the following commands:
 
 ```shell
-time snakemake --cores 8 --config sample=arabidopsis fasta=Col-CEN_v1.2.fasta --use-conda
+time snakemake --cores 8 --config sample=arabidopsis fasta=Col-CEN_v1.2.fasta
 ```
 
 This command generated 41,036,963 self-self pairwise alignments within the assembly, 16,699,976 of which passed filters for downstream analysis.
@@ -113,7 +113,7 @@ This command generated 41,036,963 self-self pairwise alignments within the assem
 Then to generate the cooler files that can be loaded in HiGlass we ran the following command with the already computed alignments:
 
 ```shell
-time snakemake --cores 8 --config sample=arabidopsis fasta=Col-CEN_v1.2.fasta --use-conda cooler
+time snakemake --cores 8 --config sample=arabidopsis fasta=Col-CEN_v1.2.fasta cooler
 ```
 
 The results can be viewed at [resgen.io/paper-data/Naish](https://resgen.io/paper-data/Naish%202021%20-%20Arabidopsis/views/EYd0Kq5XTY6jhKpCK08Jjg/), and we include a static view of the centromeres here:
