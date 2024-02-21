@@ -21,7 +21,7 @@ sys.stderr.write(msg)
 shell.prefix(f"set -eo pipefail; ")
 
 
-container: "docker://continuumio/miniconda3"
+# container: "docker://continuumio/miniconda3"
 
 
 configfile: "config/config.yaml"
