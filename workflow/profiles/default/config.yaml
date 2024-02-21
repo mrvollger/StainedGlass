@@ -1,0 +1,10 @@
+default-resources:
+  - mem_mb=16096
+  - runtime=120
+rerun-incomplete: True
+rerun-triggers: mtime
+use-conda: True
+#use-singularity: True
+show-failed-logs: True
+conda-frontend: conda
+cores: 4

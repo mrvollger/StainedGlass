@@ -4,7 +4,7 @@ import sys
 
 from snakemake.utils import min_version
 
-min_version("6.0")
+min_version("8.0")
 
 bold = "\033[1m"
 green = "\033[92m"
@@ -18,8 +18,10 @@ msg = f"""{green}{bold}Thanks for using StainedGlass and please remember to cite
 """
 sys.stderr.write(msg)
 
-SDIR = os.path.realpath(os.path.dirname(srcdir("Snakefile")))
 shell.prefix(f"set -eo pipefail; ")
+
+
+# container: "docker://continuumio/miniconda3"
 
 
 configfile: "config/config.yaml"
