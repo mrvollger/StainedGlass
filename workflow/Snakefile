@@ -283,7 +283,7 @@ rule aln:
             {params.MAP_PARAMS} \
             --dual=yes --eqx \
             {input.split_ref} {input.query} \
-                | samtools sort -m {resources.mem}G \
+                | samtools sort -m {resources.mem}G -@ {threads} \
                     -o {output.aln} \
         ) 2> {log}
         """
@@ -329,7 +329,7 @@ rule merge_aln:
     shell:
         """
         #samtools cat -b {input.alns} -o {output.aln} 
-        samtools merge -b {input.alns} {output.aln} 
+        samtools merge -@ {threads} -b {input.alns} {output.aln} 
         """
 
 
