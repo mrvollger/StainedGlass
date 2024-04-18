@@ -133,6 +133,13 @@ The results can be viewed at [resgen.io/paper-data/Naish](https://resgen.io/pape
 A full report of all steps executed and the runtime of those steps is available in
 [case-example-arabidopsis/report.html](case-example-arabidopsis/report.html).
 
+## ARM Macs
+Executing `snakemake` in the following way on ARM Macs may allow for `bioconda` to install the necessary dependencies:
+```shell
+CONDA_SUBDIR=osx-64 snakemake --cores all --use-conda
+```
+However, ARM Macs are not officially supported by StainedGlass at this time.
+
 ## TODO
 
 - Allow users to adjust the color pallet used in R
